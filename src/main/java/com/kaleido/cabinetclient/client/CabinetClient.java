@@ -297,10 +297,10 @@ public class CabinetClient<E> {
      */
     public ResponseEntity<List<E>> saveAll(@Valid List<E> entityList) {
         return retryTemplate.execute(arg0 -> {
-                HttpEntity<Object> requestEntity = new HttpEntity<Object>(entityList);
-                return restTemplate
-                        .exchange(endpoint + "/save-all", HttpMethod.POST, requestEntity, new ParameterizedTypeReference<List<E>>() {
-                        });
+                    HttpEntity<Object> requestEntity = new HttpEntity<Object>(entityList);
+                    return restTemplate
+                            .exchange(endpoint + "/save-all", HttpMethod.POST, requestEntity, new ParameterizedTypeReference<List<E>>() {
+                            });
                 }
         );
     }
@@ -309,8 +309,6 @@ public class CabinetClient<E> {
      * Deletes the entity with the matching {@code entityId}.
      *
      * @param entityId the id of the entity to delete
-     * @return a response with no body. The status and headers can be inspected to determine the success or otherwise
-     * of the deletion.
      */
     public void delete(final Long entityId) {
         retryTemplate.execute(arg0 -> {
