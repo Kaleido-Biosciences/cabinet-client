@@ -5,7 +5,7 @@
 package com.kaleido.cabinetclient;
 
 import com.kaleido.cabinetclient.authentication.CabinetJWTRequestInterceptor;
-import com.kaleido.cabinetclient.authentication.UserCredentials;
+import com.kaleido.cabinetclient.authentication.CabinetUserCredentials;
 import com.kaleido.cabinetclient.client.CabinetClient;
 import com.kaleido.cabinetclient.client.CabinetClientHTTPException;
 import com.kaleido.cabinetclient.client.CabinetResponseErrorHandler;
@@ -80,8 +80,8 @@ public class CabinetClientConfiguration {
     }
 
     @Bean
-    CabinetJWTRequestInterceptor cabinetJWTRequestInterceptor(UserCredentials userCredentials) {
-        return new CabinetJWTRequestInterceptor(userCredentials, cabinetClientProperties);
+    CabinetJWTRequestInterceptor cabinetJWTRequestInterceptor(CabinetUserCredentials cabinetUserCredentials) {
+        return new CabinetJWTRequestInterceptor(cabinetUserCredentials, cabinetClientProperties);
     }
 
     @Bean

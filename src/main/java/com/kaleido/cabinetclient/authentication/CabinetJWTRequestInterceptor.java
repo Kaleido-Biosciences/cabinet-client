@@ -21,13 +21,13 @@ import java.io.IOException;
  */
 public class CabinetJWTRequestInterceptor implements ClientHttpRequestInterceptor {
 
-    private UserCredentials userCredentials;
+    private CabinetUserCredentials cabinetUserCredentials;
     private String CabinetBase;
 
     private Logger log = LoggerFactory.getLogger(CabinetJWTRequestInterceptor.class);
 
-    public CabinetJWTRequestInterceptor(UserCredentials userCredentials, CabinetClientProperties CabinetClientProperties){
-        this.userCredentials = userCredentials;
+    public CabinetJWTRequestInterceptor(CabinetUserCredentials cabinetUserCredentials, CabinetClientProperties CabinetClientProperties){
+        this.cabinetUserCredentials = cabinetUserCredentials;
         this.CabinetBase = CabinetClientProperties.getBase();
     }
 
@@ -39,7 +39,7 @@ public class CabinetJWTRequestInterceptor implements ClientHttpRequestIntercepto
 
             log.debug("Intercepting call to {}, setting authorization header", httpRequest.getURI().toString());
             //set the token on the header
-            httpRequest.getHeaders().add(HttpHeaders.AUTHORIZATION, "Bearer " + userCredentials.getBearerToken());
+            httpRequest.getHeaders().add(HttpHeaders.AUTHORIZATION, "Bearer " + cabinetUserCredentials.getBearerToken());
         }
 
         //execute the client request

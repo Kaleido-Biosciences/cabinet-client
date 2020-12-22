@@ -42,13 +42,13 @@ public class AuthClient {
 
     /**
      * Calls the authentication endpoint of Cabinet to obtain a token
-     * @param userCredentials a Pojo with the username and password of the user
+     * @param cabinetUserCredentials a Pojo with the username and password of the user
      * @return an object wrapping the JWT token.
      */
-    public UserToken getUserToken(UserCredentials userCredentials){
+    public UserToken getUserToken(CabinetUserCredentials cabinetUserCredentials){
 
         log.info("getting user token from {}", serviceUri+AUTH_ENDPOINT);
-        UserToken userToken = restTemplate.postForObject(serviceUri + AUTH_ENDPOINT, userCredentials, UserToken.class);
+        UserToken userToken = restTemplate.postForObject(serviceUri + AUTH_ENDPOINT, cabinetUserCredentials, UserToken.class);
 
         if( StringUtils.hasText(userToken.getBearer()) ){
             log.info("obtained token");

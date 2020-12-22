@@ -23,7 +23,7 @@ import java.util.regex.PatternSyntaxException;
  * Holds the user credentials of the user that will attempt to be authenticated with the Cabinet service
  */
 @Component
-public class UserCredentials {
+public class CabinetUserCredentials {
     /**
      * How many minutes to buffer to determine when to get a new token before it actually expires so we don't risk trying to use the token between checking if it's expired and it's expiration
      */
@@ -37,9 +37,9 @@ public class UserCredentials {
     private String bearerToken = null;
     private Instant bearerExpiry = null;
 
-    Logger log = LoggerFactory.getLogger(UserCredentials.class);
+    Logger log = LoggerFactory.getLogger(CabinetUserCredentials.class);
 
-    public UserCredentials(AuthClient authClient, CabinetClientProperties CabinetClientProperties) {
+    public CabinetUserCredentials(AuthClient authClient, CabinetClientProperties CabinetClientProperties) {
         this.authClient = authClient;
         this.username = CabinetClientProperties.getUsername();
         this.password = CabinetClientProperties.getPassword();

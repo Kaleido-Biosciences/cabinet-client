@@ -47,7 +47,7 @@ public class CabinetJWTRequestInterceptorTest {
     RestTemplate restTemplate;
 
     @Autowired
-    UserCredentials userCredentials;
+    CabinetUserCredentials cabinetUserCredentials;
 
     @Autowired
     AuthClient authClient;
@@ -64,7 +64,7 @@ public class CabinetJWTRequestInterceptorTest {
 
     private static final Instant FAKE_BEARER_EXPIRED = Instant.now().minus(Duration.ofDays(1L));
     private static final Instant FAKE_BEARER_NOT_EXPIRED = Instant.now().plus(Duration.ofDays(1L));
-    private static final Instant FAKE_BEARER_IN_BUFFER = Instant.now().plus(Duration.ofMinutes(UserCredentials.EXPIRATION_BUFFER_MINUTES));
+    private static final Instant FAKE_BEARER_IN_BUFFER = Instant.now().plus(Duration.ofMinutes(CabinetUserCredentials.EXPIRATION_BUFFER_MINUTES));
 
     public static final String FAKE_BEARER_TOKEN = generateFakeBearerToken(FAKE_BEARER_NOT_EXPIRED);
 
@@ -74,14 +74,14 @@ public class CabinetJWTRequestInterceptorTest {
 
     private static String generateFakeBearerToken(Instant instantTime) {
         Long timestamp = instantTime.getEpochSecond();
-        String payload = "{\"" + UserCredentials.EXPIRY + "\":" +timestamp.toString() + "}";
+        String payload = "{\"" + CabinetUserCredentials.EXPIRY + "\":" +timestamp.toString() + "}";
         return "fake." + Base64.getEncoder().encodeToString(payload.getBytes()) + ".token";
     }
 
     @Before
     public void init() {
-        userCredentials.setBearerToken(FAKE_BEARER_TOKEN);
-        userCredentials.setBearerExpiry(FAKE_BEARER_NOT_EXPIRED);
+        cabinetUserCredentials.setBearerToken(FAKE_BEARER_TOKEN);
+        cabinetUserCredentials.setBearerExpiry(FAKE_BEARER_NOT_EXPIRED);
         mockServer = MockRestServiceServer.createServer(restTemplate);
         authServer = MockRestServiceServer.createServer(authClient.getRestTemplate());
     }
@@ -100,7 +100,7 @@ public class CabinetJWTRequestInterceptorTest {
 
     @Test
     public void jwtTokenAddIfNull() {
-        userCredentials.setBearerToken(null);
+        cabinetUserCredentials.setBearerToken(null);
 
         authServer.expect(ExpectedCount.once(),
                 requestTo(CabinetClientProperties.getBase() + "authenticate"))
@@ -108,19 +108,19 @@ public class CabinetJWTRequestInterceptorTest {
                 .andRespond(withSuccess("{\"id_token\": \"" + generateFakeBearerToken(FAKE_BEARER_NOT_EXPIRED) + "\"}", MediaType.APPLICATION_JSON));
 
 
-        userCredentials.getBearerToken();
-        assertNotNull(userCredentials.getBearerToken());
-        assertFalse(userCredentials.hasTokenExpired());
+        cabinetUserCredentials.getBearerToken();
+        assertNotNull(cabinetUserCredentials.getBearerToken());
+        assertFalse(cabinetUserCredentials.hasTokenExpired());
         authServer.verify();
     }
 
     @Test
     public void jwtTokenNotExpired() {
-        assertFalse(userCredentials.hasTokenExpired());
+        assertFalse(cabinetUserCredentials.hasTokenExpired());
 
-        userCredentials.getBearerToken();
+        cabinetUserCredentials.getBearerToken();
 
-        assertEquals(FAKE_BEARER_NOT_EXPIRED, userCredentials.getBearerExpiry());
+        assertEquals(FAKE_BEARER_NOT_EXPIRED, cabinetUserCredentials.getBearerExpiry());
     }
 
     @Test
@@ -134,8 +134,8 @@ public class CabinetJWTRequestInterceptorTest {
     }
 
     private void jwtTokenExpiredGetNewToken(Instant timestamp) {
-        userCredentials.setBearerExpiry(timestamp);
-        assertTrue(userCredentials.hasTokenExpired());
+        cabinetUserCredentials.setBearerExpiry(timestamp);
+        assertTrue(cabinetUserCredentials.hasTokenExpired());
 
         authServer.expect(ExpectedCount.once(),
                 requestTo(CabinetClientProperties.getBase() + "authenticate"))
@@ -143,9 +143,9 @@ public class CabinetJWTRequestInterceptorTest {
                 .andRespond(withSuccess("{\"id_token\": \"" + generateFakeBearerToken(FAKE_BEARER_NOT_EXPIRED) + "\"}", MediaType.APPLICATION_JSON));
 
 
-        userCredentials.getBearerToken();
+        cabinetUserCredentials.getBearerToken();
 
-        assertFalse(userCredentials.hasTokenExpired());
+        assertFalse(cabinetUserCredentials.hasTokenExpired());
         authServer.verify();
     }
 
@@ -153,7 +153,7 @@ public class CabinetJWTRequestInterceptorTest {
     public void jwtTokenShouldBeAddedToHeader() throws Exception {
         mockServer.expect(ExpectedCount.once(),
                 requestTo(CabinetClientProperties.getBase() + "plate-maps/1"))
-                .andExpect(header("Authorization", "Bearer " + userCredentials.getBearerToken()))
+                .andExpect(header("Authorization", "Bearer " + cabinetUserCredentials.getBearerToken()))
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(withStatus(HttpStatus.OK));
 
@@ -169,7 +169,7 @@ public class CabinetJWTRequestInterceptorTest {
                 restTemplate, retryTemplate, PlateMap.class);
         mockServer.expect(ExpectedCount.once(),
                 requestTo("http://someotherdomain.com/api/plate-maps/1"))
-                .andExpect(header("Authorization", "Bearer " + userCredentials.getBearerToken()))
+                .andExpect(header("Authorization", "Bearer " + cabinetUserCredentials.getBearerToken()))
                 .andRespond(withStatus(HttpStatus.OK));
 
         //ideally i'd like to ensure the Authorization header is not present but with the current version that is not

@@ -7,7 +7,7 @@ package com.kaleido.cabinetclient.client;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kaleido.cabinetclient.CabinetClientProperties;
-import com.kaleido.cabinetclient.authentication.UserCredentials;
+import com.kaleido.cabinetclient.authentication.CabinetUserCredentials;
 import com.kaleido.cabinetclient.domain.*;
 import org.junit.After;
 import org.junit.Before;
@@ -57,7 +57,7 @@ public class CabinetClientTest {
     CabinetClient<PlateMap> plateMapCabinetClient;
 
     @Autowired
-    UserCredentials userCredentials;
+    CabinetUserCredentials cabinetUserCredentials;
 
     @Autowired
     ObjectMapper objectMapper;
@@ -69,8 +69,8 @@ public class CabinetClientTest {
 
     @Before
     public void setUp() {
-        userCredentials.setBearerToken(FAKE_BEARER_TOKEN);
-        userCredentials.setBearerExpiry(FAKE_BEARER_NOT_EXPIRED);
+        cabinetUserCredentials.setBearerToken(FAKE_BEARER_TOKEN);
+        cabinetUserCredentials.setBearerExpiry(FAKE_BEARER_NOT_EXPIRED);
         server = MockRestServiceServer.createServer(restTemplate);
     }
 
@@ -119,7 +119,7 @@ public class CabinetClientTest {
         server.expect(ExpectedCount.once(),
                 requestTo(CabinetClientProperties.getBase() + CabinetClientProperties.getSearchPathComponent() + "/"
                         + "plate-maps?query=foo&page=0&size=" + MAX_VALUE))
-                .andExpect(header("Authorization", "Bearer " + userCredentials.getBearerToken()))
+                .andExpect(header("Authorization", "Bearer " + cabinetUserCredentials.getBearerToken()))
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(withStatus(HttpStatus.OK));
 
@@ -132,7 +132,7 @@ public class CabinetClientTest {
         server.expect(ExpectedCount.once(),
                 requestTo(CabinetClientProperties.getBase() + CabinetClientProperties.getSearchPathComponent() + "/"
                         + "plate-maps?query=foo&page=10&size=30"))
-                .andExpect(header("Authorization", "Bearer " + userCredentials.getBearerToken()))
+                .andExpect(header("Authorization", "Bearer " + cabinetUserCredentials.getBearerToken()))
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(withStatus(HttpStatus.OK));
 
@@ -145,14 +145,14 @@ public class CabinetClientTest {
         server.expect(ExpectedCount.once(),
                 requestTo(CabinetClientProperties.getBase() + CabinetClientProperties.getSearchPathComponent() + "/"
                         + "plate-maps?query=foo&page=0&size=" + MAX_VALUE))
-                .andExpect(header("Authorization", "Bearer " + userCredentials.getBearerToken()))
+                .andExpect(header("Authorization", "Bearer " + cabinetUserCredentials.getBearerToken()))
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(withStatus(HttpStatus.BAD_GATEWAY));
 
         server.expect(ExpectedCount.once(),
                 requestTo(CabinetClientProperties.getBase() + CabinetClientProperties.getSearchPathComponent() + "/"
                         + "plate-maps?query=foo&page=0&size=" + MAX_VALUE))
-                .andExpect(header("Authorization", "Bearer " + userCredentials.getBearerToken()))
+                .andExpect(header("Authorization", "Bearer " + cabinetUserCredentials.getBearerToken()))
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(withStatus(HttpStatus.OK));
 
@@ -165,14 +165,14 @@ public class CabinetClientTest {
         server.expect(ExpectedCount.twice(),
                 requestTo(CabinetClientProperties.getBase() + CabinetClientProperties.getSearchPathComponent() + "/"
                         + "plate-maps?query=foo&page=0&size=" + MAX_VALUE))
-                .andExpect(header("Authorization", "Bearer " + userCredentials.getBearerToken()))
+                .andExpect(header("Authorization", "Bearer " + cabinetUserCredentials.getBearerToken()))
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(withStatus(HttpStatus.BAD_GATEWAY));
 
         server.expect(ExpectedCount.once(),
                 requestTo(CabinetClientProperties.getBase() + CabinetClientProperties.getSearchPathComponent() + "/"
                         + "plate-maps?query=foo&page=0&size=" + MAX_VALUE))
-                .andExpect(header("Authorization", "Bearer " + userCredentials.getBearerToken()))
+                .andExpect(header("Authorization", "Bearer " + cabinetUserCredentials.getBearerToken()))
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(withStatus(HttpStatus.OK));
 
@@ -185,7 +185,7 @@ public class CabinetClientTest {
         server.expect(ExpectedCount.times(3),
                 requestTo(CabinetClientProperties.getBase() + CabinetClientProperties.getSearchPathComponent() + "/"
                         + "plate-maps?query=foo&page=0&size=" + MAX_VALUE))
-                .andExpect(header("Authorization", "Bearer " + userCredentials.getBearerToken()))
+                .andExpect(header("Authorization", "Bearer " + cabinetUserCredentials.getBearerToken()))
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(withStatus(HttpStatus.GATEWAY_TIMEOUT));
 
@@ -198,7 +198,7 @@ public class CabinetClientTest {
         server.expect(ExpectedCount.once(),
                 requestTo(CabinetClientProperties.getBase() + CabinetClientProperties.getSearchPathComponent() + "/"
                         + "plate-maps?query=foo&page=0&size=" + MAX_VALUE))
-                .andExpect(header("Authorization", "Bearer " + userCredentials.getBearerToken()))
+                .andExpect(header("Authorization", "Bearer " + cabinetUserCredentials.getBearerToken()))
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(withStatus(HttpStatus.INTERNAL_SERVER_ERROR));
 
@@ -211,7 +211,7 @@ public class CabinetClientTest {
         server.expect(ExpectedCount.once(),
                 requestTo(CabinetClientProperties.getBase()
                         + "plate-maps?id.equals=0&page=0&size=" + MAX_VALUE))
-                .andExpect(header("Authorization", "Bearer " + userCredentials.getBearerToken()))
+                .andExpect(header("Authorization", "Bearer " + cabinetUserCredentials.getBearerToken()))
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(withStatus(HttpStatus.OK));
 
@@ -224,14 +224,14 @@ public class CabinetClientTest {
         server.expect(ExpectedCount.once(),
                 requestTo(CabinetClientProperties.getBase()
                         + "plate-maps?id.equals=0&page=0&size=" + MAX_VALUE))
-                .andExpect(header("Authorization", "Bearer " + userCredentials.getBearerToken()))
+                .andExpect(header("Authorization", "Bearer " + cabinetUserCredentials.getBearerToken()))
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(withStatus(HttpStatus.BAD_GATEWAY));
 
         server.expect(ExpectedCount.once(),
                 requestTo(CabinetClientProperties.getBase()
                         + "plate-maps?id.equals=0&page=0&size=" + MAX_VALUE))
-                .andExpect(header("Authorization", "Bearer " + userCredentials.getBearerToken()))
+                .andExpect(header("Authorization", "Bearer " + cabinetUserCredentials.getBearerToken()))
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(withStatus(HttpStatus.OK));
 
@@ -244,14 +244,14 @@ public class CabinetClientTest {
         server.expect(ExpectedCount.twice(),
                 requestTo(CabinetClientProperties.getBase()
                         + "plate-maps?id.equals=0&page=0&size=" + MAX_VALUE))
-                .andExpect(header("Authorization", "Bearer " + userCredentials.getBearerToken()))
+                .andExpect(header("Authorization", "Bearer " + cabinetUserCredentials.getBearerToken()))
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(withStatus(HttpStatus.BAD_GATEWAY));
 
         server.expect(ExpectedCount.once(),
                 requestTo(CabinetClientProperties.getBase()
                         + "plate-maps?id.equals=0&page=0&size=" + MAX_VALUE))
-                .andExpect(header("Authorization", "Bearer " + userCredentials.getBearerToken()))
+                .andExpect(header("Authorization", "Bearer " + cabinetUserCredentials.getBearerToken()))
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(withStatus(HttpStatus.OK));
 
@@ -264,7 +264,7 @@ public class CabinetClientTest {
         server.expect(ExpectedCount.times(3),
                 requestTo(CabinetClientProperties.getBase()
                         + "plate-maps?id.equals=0&page=0&size=" + MAX_VALUE))
-                .andExpect(header("Authorization", "Bearer " + userCredentials.getBearerToken()))
+                .andExpect(header("Authorization", "Bearer " + cabinetUserCredentials.getBearerToken()))
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(withStatus(HttpStatus.BAD_GATEWAY));
 
@@ -277,7 +277,7 @@ public class CabinetClientTest {
         server.expect(ExpectedCount.once(),
                 requestTo(CabinetClientProperties.getBase()
                         + "plate-maps?id.equals=0&page=0&size=" + MAX_VALUE))
-                .andExpect(header("Authorization", "Bearer " + userCredentials.getBearerToken()))
+                .andExpect(header("Authorization", "Bearer " + cabinetUserCredentials.getBearerToken()))
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(withStatus(HttpStatus.INTERNAL_SERVER_ERROR));
 
@@ -290,7 +290,7 @@ public class CabinetClientTest {
         server.expect(ExpectedCount.once(),
                 requestTo(CabinetClientProperties.getBase()
                         + "plate-maps?id.equals=0&page=3&size=10"))
-                .andExpect(header("Authorization", "Bearer " + userCredentials.getBearerToken()))
+                .andExpect(header("Authorization", "Bearer " + cabinetUserCredentials.getBearerToken()))
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(withStatus(HttpStatus.OK));
 
@@ -303,7 +303,7 @@ public class CabinetClientTest {
         server.expect(ExpectedCount.once(),
                 requestTo(CabinetClientProperties.getBase()
                         + "plate-maps?name.equals=baa&source.equals=baz&page=0&size=" + MAX_VALUE))
-                .andExpect(header("Authorization", "Bearer " + userCredentials.getBearerToken()))
+                .andExpect(header("Authorization", "Bearer " + cabinetUserCredentials.getBearerToken()))
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(withStatus(HttpStatus.OK));
 
@@ -320,7 +320,7 @@ public class CabinetClientTest {
         server.expect(ExpectedCount.once(),
                 requestTo(CabinetClientProperties.getBase()
                         + "plate-maps?name.equals=baa&source.equals=baz&page=10&size=50"))
-                .andExpect(header("Authorization", "Bearer " + userCredentials.getBearerToken()))
+                .andExpect(header("Authorization", "Bearer " + cabinetUserCredentials.getBearerToken()))
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(withStatus(HttpStatus.OK));
 
@@ -337,7 +337,7 @@ public class CabinetClientTest {
         server.expect(ExpectedCount.once(),
                 requestTo(CabinetClientProperties.getBase()
                         + "plate-maps?id.greaterThan=15&page=0&size=" + MAX_VALUE))
-                .andExpect(header("Authorization", "Bearer " + userCredentials.getBearerToken()))
+                .andExpect(header("Authorization", "Bearer " + cabinetUserCredentials.getBearerToken()))
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(withStatus(HttpStatus.OK));
 
@@ -350,7 +350,7 @@ public class CabinetClientTest {
         server.expect(ExpectedCount.once(),
                 requestTo(CabinetClientProperties.getBase()
                         + "plate-maps?id.greaterThan=15&page=3&size=10"))
-                .andExpect(header("Authorization", "Bearer " + userCredentials.getBearerToken()))
+                .andExpect(header("Authorization", "Bearer " + cabinetUserCredentials.getBearerToken()))
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(withStatus(HttpStatus.OK));
 
@@ -363,7 +363,7 @@ public class CabinetClientTest {
         server.expect(ExpectedCount.once(),
                 requestTo(CabinetClientProperties.getBase()
                         + "plate-maps?id.greaterThan=15&name.equals=baz&page=0&size=" + MAX_VALUE))
-                .andExpect(header("Authorization", "Bearer " + userCredentials.getBearerToken()))
+                .andExpect(header("Authorization", "Bearer " + cabinetUserCredentials.getBearerToken()))
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(withStatus(HttpStatus.OK));
 
@@ -383,14 +383,14 @@ public class CabinetClientTest {
         server.expect(ExpectedCount.once(),
                 requestTo(CabinetClientProperties.getBase()
                         + "plate-maps?id.greaterThan=15&name.equals=baz&page=0&size=" + MAX_VALUE))
-                .andExpect(header("Authorization", "Bearer " + userCredentials.getBearerToken()))
+                .andExpect(header("Authorization", "Bearer " + cabinetUserCredentials.getBearerToken()))
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(withStatus(HttpStatus.BAD_GATEWAY));
 
         server.expect(ExpectedCount.once(),
                 requestTo(CabinetClientProperties.getBase()
                         + "plate-maps?id.greaterThan=15&name.equals=baz&page=0&size=" + MAX_VALUE))
-                .andExpect(header("Authorization", "Bearer " + userCredentials.getBearerToken()))
+                .andExpect(header("Authorization", "Bearer " + cabinetUserCredentials.getBearerToken()))
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(withStatus(HttpStatus.OK));
 
@@ -410,14 +410,14 @@ public class CabinetClientTest {
         server.expect(ExpectedCount.twice(),
                 requestTo(CabinetClientProperties.getBase()
                         + "plate-maps?id.greaterThan=15&name.equals=baz&page=0&size=" + MAX_VALUE))
-                .andExpect(header("Authorization", "Bearer " + userCredentials.getBearerToken()))
+                .andExpect(header("Authorization", "Bearer " + cabinetUserCredentials.getBearerToken()))
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(withStatus(HttpStatus.BAD_GATEWAY));
 
         server.expect(ExpectedCount.once(),
                 requestTo(CabinetClientProperties.getBase()
                         + "plate-maps?id.greaterThan=15&name.equals=baz&page=0&size=" + MAX_VALUE))
-                .andExpect(header("Authorization", "Bearer " + userCredentials.getBearerToken()))
+                .andExpect(header("Authorization", "Bearer " + cabinetUserCredentials.getBearerToken()))
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(withStatus(HttpStatus.OK));
 
@@ -437,7 +437,7 @@ public class CabinetClientTest {
         server.expect(ExpectedCount.times(3),
                 requestTo(CabinetClientProperties.getBase()
                         + "plate-maps?id.greaterThan=15&name.equals=baz&page=0&size=" + MAX_VALUE))
-                .andExpect(header("Authorization", "Bearer " + userCredentials.getBearerToken()))
+                .andExpect(header("Authorization", "Bearer " + cabinetUserCredentials.getBearerToken()))
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(withStatus(HttpStatus.BAD_GATEWAY));
 
@@ -457,7 +457,7 @@ public class CabinetClientTest {
         server.expect(ExpectedCount.once(),
                 requestTo(CabinetClientProperties.getBase()
                         + "plate-maps?id.greaterThan=15&name.equals=baz&page=0&size=" + MAX_VALUE))
-                .andExpect(header("Authorization", "Bearer " + userCredentials.getBearerToken()))
+                .andExpect(header("Authorization", "Bearer " + cabinetUserCredentials.getBearerToken()))
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(withStatus(HttpStatus.INTERNAL_SERVER_ERROR));
 
@@ -477,7 +477,7 @@ public class CabinetClientTest {
         server.expect(ExpectedCount.once(),
                 requestTo(CabinetClientProperties.getBase()
                         + "plate-maps?id.greaterThan=15&name.equals=baz&page=10&size=50"))
-                .andExpect(header("Authorization", "Bearer " + userCredentials.getBearerToken()))
+                .andExpect(header("Authorization", "Bearer " + cabinetUserCredentials.getBearerToken()))
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(withStatus(HttpStatus.OK));
 
@@ -497,7 +497,7 @@ public class CabinetClientTest {
         server.expect(ExpectedCount.once(),
                 requestTo(CabinetClientProperties.getBase() + CabinetClientProperties.getPlateMapEndpoint() +
                         "?page=0&size=" + MAX_VALUE))
-                .andExpect(header("Authorization", "Bearer " + userCredentials.getBearerToken()))
+                .andExpect(header("Authorization", "Bearer " + cabinetUserCredentials.getBearerToken()))
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(withStatus(HttpStatus.OK));
 
@@ -510,7 +510,7 @@ public class CabinetClientTest {
         server.expect(ExpectedCount.once(),
                 requestTo(CabinetClientProperties.getBase() + CabinetClientProperties.getPlateMapEndpoint() +
                         "?page=5&size=12"))
-                .andExpect(header("Authorization", "Bearer " + userCredentials.getBearerToken()))
+                .andExpect(header("Authorization", "Bearer " + cabinetUserCredentials.getBearerToken()))
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(withStatus(HttpStatus.OK));
 
@@ -523,14 +523,14 @@ public class CabinetClientTest {
         server.expect(ExpectedCount.once(),
                 requestTo(CabinetClientProperties.getBase() + CabinetClientProperties.getPlateMapEndpoint() +
                         "?page=0&size=" + MAX_VALUE))
-                .andExpect(header("Authorization", "Bearer " + userCredentials.getBearerToken()))
+                .andExpect(header("Authorization", "Bearer " + cabinetUserCredentials.getBearerToken()))
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(withStatus(HttpStatus.BAD_GATEWAY));
 
         server.expect(ExpectedCount.once(),
                 requestTo(CabinetClientProperties.getBase() + CabinetClientProperties.getPlateMapEndpoint() +
                         "?page=0&size=" + MAX_VALUE))
-                .andExpect(header("Authorization", "Bearer " + userCredentials.getBearerToken()))
+                .andExpect(header("Authorization", "Bearer " + cabinetUserCredentials.getBearerToken()))
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(withStatus(HttpStatus.OK));
 
@@ -543,14 +543,14 @@ public class CabinetClientTest {
         server.expect(ExpectedCount.twice(),
                 requestTo(CabinetClientProperties.getBase() + CabinetClientProperties.getPlateMapEndpoint() +
                         "?page=0&size=" + MAX_VALUE))
-                .andExpect(header("Authorization", "Bearer " + userCredentials.getBearerToken()))
+                .andExpect(header("Authorization", "Bearer " + cabinetUserCredentials.getBearerToken()))
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(withStatus(HttpStatus.BAD_GATEWAY));
 
         server.expect(ExpectedCount.once(),
                 requestTo(CabinetClientProperties.getBase() + CabinetClientProperties.getPlateMapEndpoint() +
                         "?page=0&size=" + MAX_VALUE))
-                .andExpect(header("Authorization", "Bearer " + userCredentials.getBearerToken()))
+                .andExpect(header("Authorization", "Bearer " + cabinetUserCredentials.getBearerToken()))
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(withStatus(HttpStatus.OK));
 
@@ -563,7 +563,7 @@ public class CabinetClientTest {
         server.expect(ExpectedCount.times(3),
                 requestTo(CabinetClientProperties.getBase() + CabinetClientProperties.getPlateMapEndpoint() +
                         "?page=0&size=" + MAX_VALUE))
-                .andExpect(header("Authorization", "Bearer " + userCredentials.getBearerToken()))
+                .andExpect(header("Authorization", "Bearer " + cabinetUserCredentials.getBearerToken()))
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(withStatus(HttpStatus.BAD_GATEWAY));
 
@@ -576,7 +576,7 @@ public class CabinetClientTest {
         server.expect(ExpectedCount.once(),
                 requestTo(CabinetClientProperties.getBase() + CabinetClientProperties.getPlateMapEndpoint() +
                         "?page=0&size=" + MAX_VALUE))
-                .andExpect(header("Authorization", "Bearer " + userCredentials.getBearerToken()))
+                .andExpect(header("Authorization", "Bearer " + cabinetUserCredentials.getBearerToken()))
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(withStatus(HttpStatus.INTERNAL_SERVER_ERROR));
 
@@ -591,7 +591,7 @@ public class CabinetClientTest {
 
         server.expect(ExpectedCount.once(),
                 requestTo(CabinetClientProperties.getBase() + CabinetClientProperties.getPlateMapEndpoint()))
-                .andExpect(header("Authorization", "Bearer " + userCredentials.getBearerToken()))
+                .andExpect(header("Authorization", "Bearer " + cabinetUserCredentials.getBearerToken()))
                 .andExpect(method(HttpMethod.POST))
                 .andExpect(content().json(jsonString))
                 .andRespond(withSuccess());
@@ -610,7 +610,7 @@ public class CabinetClientTest {
         server.expect(ExpectedCount.once(),
                 requestTo(CabinetClientProperties.getBase() + CabinetClientProperties.getPlateMapEndpoint()
                         + "/save-all"))
-                .andExpect(header("Authorization", "Bearer " + userCredentials.getBearerToken()))
+                .andExpect(header("Authorization", "Bearer " + cabinetUserCredentials.getBearerToken()))
                 .andExpect(method(HttpMethod.POST))
                 .andExpect(content().json(jsonString))
                 .andRespond(withSuccess());
@@ -629,7 +629,7 @@ public class CabinetClientTest {
         server.expect(ExpectedCount.once(),
                 requestTo(CabinetClientProperties.getBase() + CabinetClientProperties.getPlateMapEndpoint()
                         + "/save-all"))
-                .andExpect(header("Authorization", "Bearer " + userCredentials.getBearerToken()))
+                .andExpect(header("Authorization", "Bearer " + cabinetUserCredentials.getBearerToken()))
                 .andExpect(method(HttpMethod.POST))
                 .andExpect(content().json(jsonString))
                 .andRespond(withStatus(HttpStatus.NOT_FOUND));
@@ -647,7 +647,7 @@ public class CabinetClientTest {
 
         server.expect(ExpectedCount.once(),
                 requestTo(CabinetClientProperties.getBase() + CabinetClientProperties.getPlateMapEndpoint()))
-                .andExpect(header("Authorization", "Bearer " + userCredentials.getBearerToken()))
+                .andExpect(header("Authorization", "Bearer " + cabinetUserCredentials.getBearerToken()))
                 .andExpect(method(HttpMethod.PUT))
                 .andExpect(content().json(jsonString))
                 .andRespond(withSuccess());
@@ -663,14 +663,14 @@ public class CabinetClientTest {
 
         server.expect(ExpectedCount.once(),
                 requestTo(CabinetClientProperties.getBase() + CabinetClientProperties.getPlateMapEndpoint()))
-                .andExpect(header("Authorization", "Bearer " + userCredentials.getBearerToken()))
+                .andExpect(header("Authorization", "Bearer " + cabinetUserCredentials.getBearerToken()))
                 .andExpect(method(HttpMethod.POST))
                 .andExpect(content().json(jsonString))
                 .andRespond(withStatus(HttpStatus.BAD_GATEWAY));
 
         server.expect(ExpectedCount.once(),
                 requestTo(CabinetClientProperties.getBase() + CabinetClientProperties.getPlateMapEndpoint()))
-                .andExpect(header("Authorization", "Bearer " + userCredentials.getBearerToken()))
+                .andExpect(header("Authorization", "Bearer " + cabinetUserCredentials.getBearerToken()))
                 .andExpect(method(HttpMethod.POST))
                 .andExpect(content().json(jsonString))
                 .andRespond(withStatus(HttpStatus.OK));
@@ -686,14 +686,14 @@ public class CabinetClientTest {
 
         server.expect(ExpectedCount.twice(),
                 requestTo(CabinetClientProperties.getBase() + CabinetClientProperties.getPlateMapEndpoint()))
-                .andExpect(header("Authorization", "Bearer " + userCredentials.getBearerToken()))
+                .andExpect(header("Authorization", "Bearer " + cabinetUserCredentials.getBearerToken()))
                 .andExpect(method(HttpMethod.POST))
                 .andExpect(content().json(jsonString))
                 .andRespond(withStatus(HttpStatus.BAD_GATEWAY));
 
         server.expect(ExpectedCount.once(),
                 requestTo(CabinetClientProperties.getBase() + CabinetClientProperties.getPlateMapEndpoint()))
-                .andExpect(header("Authorization", "Bearer " + userCredentials.getBearerToken()))
+                .andExpect(header("Authorization", "Bearer " + cabinetUserCredentials.getBearerToken()))
                 .andExpect(method(HttpMethod.POST))
                 .andExpect(content().json(jsonString))
                 .andRespond(withStatus(HttpStatus.OK));
@@ -709,7 +709,7 @@ public class CabinetClientTest {
 
         server.expect(ExpectedCount.times(3),
                 requestTo(CabinetClientProperties.getBase() + CabinetClientProperties.getPlateMapEndpoint()))
-                .andExpect(header("Authorization", "Bearer " + userCredentials.getBearerToken()))
+                .andExpect(header("Authorization", "Bearer " + cabinetUserCredentials.getBearerToken()))
                 .andExpect(method(HttpMethod.POST))
                 .andExpect(content().json(jsonString))
                 .andRespond(withStatus(HttpStatus.BAD_GATEWAY));
@@ -725,7 +725,7 @@ public class CabinetClientTest {
 
         server.expect(ExpectedCount.once(),
                 requestTo(CabinetClientProperties.getBase() + CabinetClientProperties.getPlateMapEndpoint()))
-                .andExpect(header("Authorization", "Bearer " + userCredentials.getBearerToken()))
+                .andExpect(header("Authorization", "Bearer " + cabinetUserCredentials.getBearerToken()))
                 .andExpect(method(HttpMethod.POST))
                 .andExpect(content().json(jsonString))
                 .andRespond(withStatus(HttpStatus.INTERNAL_SERVER_ERROR));
@@ -805,7 +805,7 @@ public class CabinetClientTest {
         server.expect(ExpectedCount.once(),
                 requestTo(CabinetClientProperties.getBase()
                         + "plate-maps?name.equals=foo&page=0&size=" + MAX_VALUE))
-                .andExpect(header("Authorization", "Bearer " + userCredentials.getBearerToken()))
+                .andExpect(header("Authorization", "Bearer " + cabinetUserCredentials.getBearerToken()))
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(withStatus(HttpStatus.OK));
 
@@ -818,7 +818,7 @@ public class CabinetClientTest {
         server.expect(ExpectedCount.once(),
                 requestTo(CabinetClientProperties.getBase()
                         + "plate-maps?name.equals=foo&page=1&size=10"))
-                .andExpect(header("Authorization", "Bearer " + userCredentials.getBearerToken()))
+                .andExpect(header("Authorization", "Bearer " + cabinetUserCredentials.getBearerToken()))
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(withStatus(HttpStatus.OK));
 
@@ -831,7 +831,7 @@ public class CabinetClientTest {
         server.expect(ExpectedCount.once(),
                 requestTo(CabinetClientProperties.getBase()
                         + "plate-maps?name.equals=foo&page=0&size=1"))
-                .andExpect(header("Authorization", "Bearer " + userCredentials.getBearerToken()))
+                .andExpect(header("Authorization", "Bearer " + cabinetUserCredentials.getBearerToken()))
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(withStatus(HttpStatus.OK));
 
@@ -845,7 +845,7 @@ public class CabinetClientTest {
         server.expect(ExpectedCount.once(),
                 requestTo(CabinetClientProperties.getBase()
                         + "plate-maps?label.equals=foo&page=0&size=" + MAX_VALUE))
-                .andExpect(header("Authorization", "Bearer " + userCredentials.getBearerToken()))
+                .andExpect(header("Authorization", "Bearer " + cabinetUserCredentials.getBearerToken()))
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(withStatus(HttpStatus.OK));
 
@@ -859,7 +859,7 @@ public class CabinetClientTest {
         server.expect(ExpectedCount.once(),
                 requestTo(CabinetClientProperties.getBase()
                         + "plate-maps?label.equals=foo&page=1&size=10"))
-                .andExpect(header("Authorization", "Bearer " + userCredentials.getBearerToken()))
+                .andExpect(header("Authorization", "Bearer " + cabinetUserCredentials.getBearerToken()))
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(withStatus(HttpStatus.OK));
 
@@ -872,7 +872,7 @@ public class CabinetClientTest {
         server.expect(ExpectedCount.once(),
                 requestTo(CabinetClientProperties.getBase()
                         + "plate-maps?label.equals=name&page=0&size=1"))
-                .andExpect(header("Authorization", "Bearer " + userCredentials.getBearerToken()))
+                .andExpect(header("Authorization", "Bearer " + cabinetUserCredentials.getBearerToken()))
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(withStatus(HttpStatus.OK));
 
@@ -942,7 +942,7 @@ public class CabinetClientTest {
         server.expect(ExpectedCount.once(),
                 requestTo(CabinetClientProperties.getBase()
                         + "plate-maps?wellId.equals=1&communityId.equals=1&plateMapId.equals=1&mediaId.equals=1&page=10&size=50"))
-                .andExpect(header("Authorization", "Bearer " + userCredentials.getBearerToken()))
+                .andExpect(header("Authorization", "Bearer " + cabinetUserCredentials.getBearerToken()))
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(withStatus(HttpStatus.OK));
 

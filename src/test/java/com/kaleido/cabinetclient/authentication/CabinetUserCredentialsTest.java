@@ -17,18 +17,18 @@ import static org.junit.Assert.*;
         "Cabinet.client.username=admin",
         "Cabinet.client.password=test",
         "Cabinet.client.base=http://localhost:8080/"})
-public class UserCredentialsTest {
+public class CabinetUserCredentialsTest {
 
     @Autowired
-    private UserCredentials userCredentials;
+    private CabinetUserCredentials cabinetUserCredentials;
 
     @Test
     public void usernameShouldBeInjected() {
-        assertEquals("username should be injected", "admin", userCredentials.getUsername());
+        assertEquals("username should be injected", "admin", cabinetUserCredentials.getUsername());
     }
 
     @Test
     public void passwordShouldBeInjected() {
-        assertEquals("password should be injected", "test", userCredentials.getPassword());
+        assertEquals("password should be injected", "test", cabinetUserCredentials.getPassword());
     }
 }
