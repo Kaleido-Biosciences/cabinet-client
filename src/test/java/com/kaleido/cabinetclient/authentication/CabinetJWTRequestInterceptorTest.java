@@ -50,7 +50,7 @@ public class CabinetJWTRequestInterceptorTest {
     CabinetUserCredentials cabinetUserCredentials;
 
     @Autowired
-    AuthClient authClient;
+    CabinetAuthClient cabinetAuthClient;
 
     @Autowired
     CabinetClientProperties CabinetClientProperties;
@@ -83,7 +83,7 @@ public class CabinetJWTRequestInterceptorTest {
         cabinetUserCredentials.setBearerToken(FAKE_BEARER_TOKEN);
         cabinetUserCredentials.setBearerExpiry(FAKE_BEARER_NOT_EXPIRED);
         mockServer = MockRestServiceServer.createServer(restTemplate);
-        authServer = MockRestServiceServer.createServer(authClient.getRestTemplate());
+        authServer = MockRestServiceServer.createServer(cabinetAuthClient.getRestTemplate());
     }
 
     @After

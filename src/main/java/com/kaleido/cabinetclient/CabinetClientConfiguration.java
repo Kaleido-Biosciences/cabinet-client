@@ -40,7 +40,7 @@ public class CabinetClientConfiguration {
 
     @Bean
     @Primary
-    RestTemplate restTemplate(CabinetJWTRequestInterceptor cabinetJWTRequestInterceptor) {
+    RestTemplate cabinetRestTemplate(CabinetJWTRequestInterceptor cabinetJWTRequestInterceptor) {
         RestTemplate restTemplate = new RestTemplate();
         restTemplate.getInterceptors().add(cabinetJWTRequestInterceptor);
         restTemplate.setErrorHandler(new CabinetResponseErrorHandler());
@@ -51,7 +51,7 @@ public class CabinetClientConfiguration {
      * Configuration for Cabinet Client Retry template.  When a request returns an exception related to 502 or 503
      * the service can automatically retry up to a predefined amount of times (Default: 3 including original call)
      * after an incremental amount of wait time (Default 5 seconds, doubling each attempt with default max of 15 seconds)
-     * The following CabinetClientProperties can be changed to change the behavior of the retryTemplate
+     * The following CabinetClientProperties can be changed to change the behavior of the cabinetRetryTemplate
      * <p>
      * retryInterval: The initial delay, in milliseconds, before the request is retried (default: 5000L)
      * retryMultiplier: The value that the delay interval will be multiplied by before each attempt (default: 2.0D)
@@ -62,7 +62,7 @@ public class CabinetClientConfiguration {
      * Setting this value to 1 would effectively disable retry.
      **/
     @Bean
-    public RetryTemplate retryTemplate() {
+    public RetryTemplate cabinetRetryTemplate() {
         RetryTemplate retryTemplate = new RetryTemplate();
         ExponentialBackOffPolicy exponentialBackOffPolicy = new ExponentialBackOffPolicy();
         exponentialBackOffPolicy.setInitialInterval(cabinetClientProperties.getRetryInterval());
@@ -85,7 +85,7 @@ public class CabinetClientConfiguration {
     }
 
     @Bean
-    CabinetClient<Authority> authorityClient(RestTemplate restTemplate, RetryTemplate retryTemplate) {
+    CabinetClient<Authority> cabinetAuthorityClient(RestTemplate restTemplate, RetryTemplate retryTemplate) {
         return new CabinetClient<>(cabinetClientProperties.getBase() + cabinetClientProperties.getAuthorityEndpoint(),
                 cabinetClientProperties.getBase() +
                         cabinetClientProperties.getSearchPathComponent() + "/"
@@ -94,7 +94,7 @@ public class CabinetClientConfiguration {
     }
 
     @Bean
-    CabinetClient<PersistentAuditEvent> persistentAuditEventClient(RestTemplate restTemplate, RetryTemplate retryTemplate) {
+    CabinetClient<PersistentAuditEvent> cabinetPersistentAuditEventClient(RestTemplate restTemplate, RetryTemplate retryTemplate) {
         return new CabinetClient<>(cabinetClientProperties.getBase() + cabinetClientProperties.getPersistentAuditEventEndpoint(),
                 cabinetClientProperties.getBase() +
                         cabinetClientProperties.getSearchPathComponent() + "/"
@@ -104,7 +104,7 @@ public class CabinetClientConfiguration {
 
 
     @Bean
-    CabinetClient<PlateMap> plateMapClient(RestTemplate restTemplate, RetryTemplate retryTemplate) {
+    CabinetClient<PlateMap> cabinetPlateMapClient(RestTemplate restTemplate, RetryTemplate retryTemplate) {
         return new CabinetClient<>(cabinetClientProperties.getBase() + cabinetClientProperties.getPlateMapEndpoint(),
                 cabinetClientProperties.getBase() +
                         cabinetClientProperties.getSearchPathComponent() + "/"
@@ -113,7 +113,7 @@ public class CabinetClientConfiguration {
     }
 
     @Bean
-    CabinetClient<User> userClient(RestTemplate restTemplate, RetryTemplate retryTemplate) {
+    CabinetClient<User> cabinetUserClient(RestTemplate restTemplate, RetryTemplate retryTemplate) {
         return new CabinetClient<>(cabinetClientProperties.getBase() + cabinetClientProperties.getUserEndpoint(),
                 cabinetClientProperties.getBase() +
                         cabinetClientProperties.getSearchPathComponent() + "/"

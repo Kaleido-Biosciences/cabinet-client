@@ -18,19 +18,19 @@ import org.springframework.web.client.RestTemplate;
  */
 @Service
 @EnableConfigurationProperties({CabinetClientProperties.class})
-public class AuthClient {
+public class CabinetAuthClient {
     private RestTemplate restTemplate;
     private String serviceUri;
 
     public static final String AUTH_ENDPOINT = "authenticate";
 
-    Logger log = LoggerFactory.getLogger(AuthClient.class);
+    Logger log = LoggerFactory.getLogger(CabinetAuthClient.class);
 
     public RestTemplate getRestTemplate() {
         return restTemplate;
     }
 
-    public AuthClient(CabinetClientProperties CabinetClientProperties) {
+    public CabinetAuthClient(CabinetClientProperties CabinetClientProperties) {
         this.serviceUri = CabinetClientProperties.getBase();
 
         /*

@@ -33,14 +33,14 @@ public class CabinetUserCredentials {
     private String username;
     private String password;
 
-    private AuthClient authClient;
+    private CabinetAuthClient cabinetAuthClient;
     private String bearerToken = null;
     private Instant bearerExpiry = null;
 
     Logger log = LoggerFactory.getLogger(CabinetUserCredentials.class);
 
-    public CabinetUserCredentials(AuthClient authClient, CabinetClientProperties CabinetClientProperties) {
-        this.authClient = authClient;
+    public CabinetUserCredentials(CabinetAuthClient cabinetAuthClient, CabinetClientProperties CabinetClientProperties) {
+        this.cabinetAuthClient = cabinetAuthClient;
         this.username = CabinetClientProperties.getUsername();
         this.password = CabinetClientProperties.getPassword();
     }
@@ -68,7 +68,7 @@ public class CabinetUserCredentials {
     @JsonIgnore
     public String getBearerToken() {
         if (bearerToken == null || hasTokenExpired()) {
-            UserToken userToken = authClient.getUserToken(this);
+            UserToken userToken = cabinetAuthClient.getUserToken(this);
             bearerToken = userToken.getBearer();
             bearerExpiry = getExpiryFromBearer();
         }
