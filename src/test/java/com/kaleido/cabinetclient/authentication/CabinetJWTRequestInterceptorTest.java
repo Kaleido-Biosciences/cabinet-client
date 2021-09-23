@@ -8,7 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kaleido.cabinetclient.CabinetClientProperties;
 import com.kaleido.cabinetclient.client.CabinetClient;
 import com.kaleido.cabinetclient.client.CabinetResponseErrorHandler;
-import com.kaleido.cabinetclient.domain.PlateMap;
+import com.kaleido.cabinetclient.domain.CabinetPlateMap;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -56,7 +56,7 @@ public class CabinetJWTRequestInterceptorTest {
     CabinetClientProperties CabinetClientProperties;
 
     @Autowired
-    CabinetClient<PlateMap> plateMapCabinetClient;
+    CabinetClient<CabinetPlateMap> cabinetPlateMapCabinetClient;
 
     @Autowired
     RetryTemplate retryTemplate;
@@ -157,16 +157,16 @@ public class CabinetJWTRequestInterceptorTest {
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(withStatus(HttpStatus.OK));
 
-        plateMapCabinetClient.find(1L);
+        cabinetPlateMapCabinetClient.find(1L);
         mockServer.verify();
     }
 
     @Test(expected = AssertionError.class)
     public void jwtTokenShouldNotBeAddedForOtherUrls() throws Exception {
         restTemplate.setErrorHandler(new CabinetResponseErrorHandler());
-        CabinetClient<PlateMap> myClient = new CabinetClient<>("http://someotherdomain.com/api/plate-maps",
+        CabinetClient<CabinetPlateMap> myClient = new CabinetClient<>("http://someotherdomain.com/api/plate-maps",
                 "http://someotherdomain.com/api/_search/plate-maps",
-                restTemplate, retryTemplate, PlateMap.class);
+                restTemplate, retryTemplate, CabinetPlateMap.class);
         mockServer.expect(ExpectedCount.once(),
                 requestTo("http://someotherdomain.com/api/plate-maps/1"))
                 .andExpect(header("Authorization", "Bearer " + cabinetUserCredentials.getBearerToken()))

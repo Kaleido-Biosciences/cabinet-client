@@ -1,15 +1,17 @@
 package com.kaleido.cabinetclient.domain;
-import com.kaleido.cabinetclient.domain.enumeration.Status;
+
+import javax.validation.constraints.*;
 
 import java.io.Serializable;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
+import com.kaleido.cabinetclient.domain.enumeration.Status;
 
 /**
- * A PlateMap.
+ * A CabinetPlateMap.
  */
-public class PlateMap implements Serializable {
+public class CabinetPlateMap implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -34,6 +36,11 @@ public class PlateMap implements Serializable {
      */
     private String data;
 
+    /**
+     * The number of plates that are in the CabinetPlateMap
+     */
+    private Integer numPlates;
+
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
     public Long getId() {
         return id;
@@ -47,7 +54,7 @@ public class PlateMap implements Serializable {
         return status;
     }
 
-    public PlateMap status(Status status) {
+    public CabinetPlateMap status(Status status) {
         this.status = status;
         return this;
     }
@@ -60,7 +67,7 @@ public class PlateMap implements Serializable {
         return lastModified;
     }
 
-    public PlateMap lastModified(ZonedDateTime lastModified) {
+    public CabinetPlateMap lastModified(ZonedDateTime lastModified) {
         this.lastModified = lastModified;
         return this;
     }
@@ -73,7 +80,7 @@ public class PlateMap implements Serializable {
         return checksum;
     }
 
-    public PlateMap checksum(String checksum) {
+    public CabinetPlateMap checksum(String checksum) {
         this.checksum = checksum;
         return this;
     }
@@ -86,7 +93,7 @@ public class PlateMap implements Serializable {
         return activityName;
     }
 
-    public PlateMap activityName(String activityName) {
+    public CabinetPlateMap activityName(String activityName) {
         this.activityName = activityName;
         return this;
     }
@@ -99,7 +106,7 @@ public class PlateMap implements Serializable {
         return data;
     }
 
-    public PlateMap data(String data) {
+    public CabinetPlateMap data(String data) {
         this.data = data;
         return this;
     }
@@ -107,16 +114,30 @@ public class PlateMap implements Serializable {
     public void setData(String data) {
         this.data = data;
     }
+    // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here, do not remove
+
+    public Integer getNumPlates() {
+        return numPlates;
+    }
+
+    public CabinetPlateMap numPlates(Integer numPlates) {
+        this.numPlates = numPlates;
+        return this;
+    }
+
+    public void setNumPlates(Integer numPlates) {
+        this.numPlates = numPlates;
+    }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof PlateMap)) {
+        if (!(o instanceof CabinetPlateMap)) {
             return false;
         }
-        return id != null && id.equals(((PlateMap) o).id);
+        return id != null && id.equals(((CabinetPlateMap) o).id);
     }
 
     @Override
@@ -126,11 +147,12 @@ public class PlateMap implements Serializable {
 
     @Override
     public String toString() {
-        return "PlateMap{" +
+        return "CabinetPlateMap{" +
                 "id=" + getId() +
                 ", status='" + getStatus() + "'" +
                 ", lastModified='" + getLastModified() + "'" +
                 ", checksum='" + getChecksum() + "'" +
+                ", numPlates='" + getNumPlates() + "'" +
                 ", activityName='" + getActivityName() + "'" +
                 ", data='" + getData() + "'" +
                 "}";
@@ -138,6 +160,6 @@ public class PlateMap implements Serializable {
 
     public String prepareStringForChecksum() {
         DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
-        return getStatus().toString() + getLastModified().format(formatter)+getActivityName()+getData();
+        return getStatus().toString()+getLastModified().format(formatter)+getActivityName()+getData();
     }
 }

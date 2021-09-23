@@ -51,10 +51,10 @@ public class CabinetClientTest {
     CabinetClientProperties CabinetClientProperties;
 
     @Autowired
-    CabinetClient<PlateMap> CabinetClient;
+    CabinetClient<CabinetPlateMap> CabinetClient;
 
     @Autowired
-    CabinetClient<PlateMap> plateMapCabinetClient;
+    CabinetClient<CabinetPlateMap> cabinetPlateMapCabinetClient;
 
     @Autowired
     CabinetUserCredentials cabinetUserCredentials;
@@ -82,7 +82,7 @@ public class CabinetClientTest {
     @Test
     public void findById() {
         server.expect(ExpectedCount.once(),
-                requestTo(CabinetClientProperties.getBase() + CabinetClientProperties.getPlateMapEndpoint() + "/1"))
+                requestTo(CabinetClientProperties.getBase() + CabinetClientProperties.getCabinetPlateMapEndpoint() + "/1"))
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(withStatus(HttpStatus.OK));
 
@@ -94,7 +94,7 @@ public class CabinetClientTest {
     public void findOneByMethod() {
         String methodName = "/label";
         server.expect(ExpectedCount.once(),
-                requestTo(CabinetClientProperties.getBase() + CabinetClientProperties.getPlateMapEndpoint() + methodName + "/test"))
+                requestTo(CabinetClientProperties.getBase() + CabinetClientProperties.getCabinetPlateMapEndpoint() + methodName + "/test"))
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(withStatus(HttpStatus.OK));
 
@@ -106,7 +106,7 @@ public class CabinetClientTest {
     public void findOneByMethodNoEndpointShouldThrowNotFound() {
         String methodName = "/label";
         server.expect(ExpectedCount.once(),
-                requestTo(CabinetClientProperties.getBase() + CabinetClientProperties.getPlateMapEndpoint() + methodName + "/test"))
+                requestTo(CabinetClientProperties.getBase() + CabinetClientProperties.getCabinetPlateMapEndpoint() + methodName + "/test"))
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(withStatus(HttpStatus.NOT_FOUND));
 
@@ -495,7 +495,7 @@ public class CabinetClientTest {
     @Test
     public void findAll() {
         server.expect(ExpectedCount.once(),
-                requestTo(CabinetClientProperties.getBase() + CabinetClientProperties.getPlateMapEndpoint() +
+                requestTo(CabinetClientProperties.getBase() + CabinetClientProperties.getCabinetPlateMapEndpoint() +
                         "?page=0&size=" + MAX_VALUE))
                 .andExpect(header("Authorization", "Bearer " + cabinetUserCredentials.getBearerToken()))
                 .andExpect(method(HttpMethod.GET))
@@ -508,7 +508,7 @@ public class CabinetClientTest {
     @Test
     public void findAllWithPaging() {
         server.expect(ExpectedCount.once(),
-                requestTo(CabinetClientProperties.getBase() + CabinetClientProperties.getPlateMapEndpoint() +
+                requestTo(CabinetClientProperties.getBase() + CabinetClientProperties.getCabinetPlateMapEndpoint() +
                         "?page=5&size=12"))
                 .andExpect(header("Authorization", "Bearer " + cabinetUserCredentials.getBearerToken()))
                 .andExpect(method(HttpMethod.GET))
@@ -521,14 +521,14 @@ public class CabinetClientTest {
     @Test
     public void findAllRetryOnce() {
         server.expect(ExpectedCount.once(),
-                requestTo(CabinetClientProperties.getBase() + CabinetClientProperties.getPlateMapEndpoint() +
+                requestTo(CabinetClientProperties.getBase() + CabinetClientProperties.getCabinetPlateMapEndpoint() +
                         "?page=0&size=" + MAX_VALUE))
                 .andExpect(header("Authorization", "Bearer " + cabinetUserCredentials.getBearerToken()))
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(withStatus(HttpStatus.BAD_GATEWAY));
 
         server.expect(ExpectedCount.once(),
-                requestTo(CabinetClientProperties.getBase() + CabinetClientProperties.getPlateMapEndpoint() +
+                requestTo(CabinetClientProperties.getBase() + CabinetClientProperties.getCabinetPlateMapEndpoint() +
                         "?page=0&size=" + MAX_VALUE))
                 .andExpect(header("Authorization", "Bearer " + cabinetUserCredentials.getBearerToken()))
                 .andExpect(method(HttpMethod.GET))
@@ -541,14 +541,14 @@ public class CabinetClientTest {
     @Test
     public void findAllRetryTwice() {
         server.expect(ExpectedCount.twice(),
-                requestTo(CabinetClientProperties.getBase() + CabinetClientProperties.getPlateMapEndpoint() +
+                requestTo(CabinetClientProperties.getBase() + CabinetClientProperties.getCabinetPlateMapEndpoint() +
                         "?page=0&size=" + MAX_VALUE))
                 .andExpect(header("Authorization", "Bearer " + cabinetUserCredentials.getBearerToken()))
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(withStatus(HttpStatus.BAD_GATEWAY));
 
         server.expect(ExpectedCount.once(),
-                requestTo(CabinetClientProperties.getBase() + CabinetClientProperties.getPlateMapEndpoint() +
+                requestTo(CabinetClientProperties.getBase() + CabinetClientProperties.getCabinetPlateMapEndpoint() +
                         "?page=0&size=" + MAX_VALUE))
                 .andExpect(header("Authorization", "Bearer " + cabinetUserCredentials.getBearerToken()))
                 .andExpect(method(HttpMethod.GET))
@@ -561,7 +561,7 @@ public class CabinetClientTest {
     @Test(expected = CabinetClientHTTPException.class)
     public void findAllShouldNotTryMoreThanThreeTimes() throws CabinetClientHTTPException {
         server.expect(ExpectedCount.times(3),
-                requestTo(CabinetClientProperties.getBase() + CabinetClientProperties.getPlateMapEndpoint() +
+                requestTo(CabinetClientProperties.getBase() + CabinetClientProperties.getCabinetPlateMapEndpoint() +
                         "?page=0&size=" + MAX_VALUE))
                 .andExpect(header("Authorization", "Bearer " + cabinetUserCredentials.getBearerToken()))
                 .andExpect(method(HttpMethod.GET))
@@ -574,7 +574,7 @@ public class CabinetClientTest {
     @Test(expected = HttpServerErrorException.class)
     public void findAllOtherExceptionShouldNotRetry() {
         server.expect(ExpectedCount.once(),
-                requestTo(CabinetClientProperties.getBase() + CabinetClientProperties.getPlateMapEndpoint() +
+                requestTo(CabinetClientProperties.getBase() + CabinetClientProperties.getCabinetPlateMapEndpoint() +
                         "?page=0&size=" + MAX_VALUE))
                 .andExpect(header("Authorization", "Bearer " + cabinetUserCredentials.getBearerToken()))
                 .andExpect(method(HttpMethod.GET))
@@ -586,151 +586,151 @@ public class CabinetClientTest {
 
     @Test
     public void save() throws Exception {
-        PlateMap plateMap = new PlateMap().activityName("G123BBB");
-        String jsonString = objectMapper.writeValueAsString(plateMap);
+        CabinetPlateMap cabinetPlateMap = new CabinetPlateMap().activityName("G123BBB");
+        String jsonString = objectMapper.writeValueAsString(cabinetPlateMap);
 
         server.expect(ExpectedCount.once(),
-                requestTo(CabinetClientProperties.getBase() + CabinetClientProperties.getPlateMapEndpoint()))
+                requestTo(CabinetClientProperties.getBase() + CabinetClientProperties.getCabinetPlateMapEndpoint()))
                 .andExpect(header("Authorization", "Bearer " + cabinetUserCredentials.getBearerToken()))
                 .andExpect(method(HttpMethod.POST))
                 .andExpect(content().json(jsonString))
                 .andRespond(withSuccess());
 
-        CabinetClient.save(plateMap);
+        CabinetClient.save(cabinetPlateMap);
         server.verify();
     }
 
     @Test
     public void saveAll() throws Exception {
-        List<PlateMap> plateMaps = new ArrayList();
-        plateMaps.add(new PlateMap().activityName("G123BBB"));
-        plateMaps.add(new PlateMap().activityName("G345CCC"));
+        List<CabinetPlateMap> cabinetPlateMaps = new ArrayList();
+        cabinetPlateMaps.add(new CabinetPlateMap().activityName("G123BBB"));
+        cabinetPlateMaps.add(new CabinetPlateMap().activityName("G345CCC"));
 
-        String jsonString = objectMapper.writeValueAsString(plateMaps);
+        String jsonString = objectMapper.writeValueAsString(cabinetPlateMaps);
         server.expect(ExpectedCount.once(),
-                requestTo(CabinetClientProperties.getBase() + CabinetClientProperties.getPlateMapEndpoint()
+                requestTo(CabinetClientProperties.getBase() + CabinetClientProperties.getCabinetPlateMapEndpoint()
                         + "/save-all"))
                 .andExpect(header("Authorization", "Bearer " + cabinetUserCredentials.getBearerToken()))
                 .andExpect(method(HttpMethod.POST))
                 .andExpect(content().json(jsonString))
                 .andRespond(withSuccess());
 
-        CabinetClient.saveAll(plateMaps);
+        CabinetClient.saveAll(cabinetPlateMaps);
         server.verify();
     }
 
     @Test(expected = HttpClientErrorException.class)
     public void saveAllNoEndpointShouldThrowNotFoundError() throws Exception {
-        List<PlateMap> plateMaps = new ArrayList();
-        plateMaps.add(new PlateMap().activityName("G123BBB"));
-        plateMaps.add(new PlateMap().activityName("G345CCC"));
+        List<CabinetPlateMap> cabinetPlateMaps = new ArrayList();
+        cabinetPlateMaps.add(new CabinetPlateMap().activityName("G123BBB"));
+        cabinetPlateMaps.add(new CabinetPlateMap().activityName("G345CCC"));
 
-        String jsonString = objectMapper.writeValueAsString(plateMaps);
+        String jsonString = objectMapper.writeValueAsString(cabinetPlateMaps);
         server.expect(ExpectedCount.once(),
-                requestTo(CabinetClientProperties.getBase() + CabinetClientProperties.getPlateMapEndpoint()
+                requestTo(CabinetClientProperties.getBase() + CabinetClientProperties.getCabinetPlateMapEndpoint()
                         + "/save-all"))
                 .andExpect(header("Authorization", "Bearer " + cabinetUserCredentials.getBearerToken()))
                 .andExpect(method(HttpMethod.POST))
                 .andExpect(content().json(jsonString))
                 .andRespond(withStatus(HttpStatus.NOT_FOUND));
 
-        CabinetClient.saveAll(plateMaps);
+        CabinetClient.saveAll(cabinetPlateMaps);
         server.verify();
     }
 
     @Test
     public void saveWithSetId() throws Exception {
-        PlateMap plateMap = new PlateMap().activityName("G123BBB");
-        plateMap.setId(10L);
+        CabinetPlateMap cabinetPlateMap = new CabinetPlateMap().activityName("G123BBB");
+        cabinetPlateMap.setId(10L);
 
-        String jsonString = objectMapper.writeValueAsString(plateMap);
+        String jsonString = objectMapper.writeValueAsString(cabinetPlateMap);
 
         server.expect(ExpectedCount.once(),
-                requestTo(CabinetClientProperties.getBase() + CabinetClientProperties.getPlateMapEndpoint()))
+                requestTo(CabinetClientProperties.getBase() + CabinetClientProperties.getCabinetPlateMapEndpoint()))
                 .andExpect(header("Authorization", "Bearer " + cabinetUserCredentials.getBearerToken()))
                 .andExpect(method(HttpMethod.PUT))
                 .andExpect(content().json(jsonString))
                 .andRespond(withSuccess());
 
-        CabinetClient.save(plateMap);
+        CabinetClient.save(cabinetPlateMap);
         server.verify();
     }
 
     @Test
     public void saveRetryOnce() throws JsonProcessingException {
-        PlateMap plateMap = new PlateMap().activityName("G123BBB");
-        String jsonString = objectMapper.writeValueAsString(plateMap);
+        CabinetPlateMap cabinetPlateMap = new CabinetPlateMap().activityName("G123BBB");
+        String jsonString = objectMapper.writeValueAsString(cabinetPlateMap);
 
         server.expect(ExpectedCount.once(),
-                requestTo(CabinetClientProperties.getBase() + CabinetClientProperties.getPlateMapEndpoint()))
+                requestTo(CabinetClientProperties.getBase() + CabinetClientProperties.getCabinetPlateMapEndpoint()))
                 .andExpect(header("Authorization", "Bearer " + cabinetUserCredentials.getBearerToken()))
                 .andExpect(method(HttpMethod.POST))
                 .andExpect(content().json(jsonString))
                 .andRespond(withStatus(HttpStatus.BAD_GATEWAY));
 
         server.expect(ExpectedCount.once(),
-                requestTo(CabinetClientProperties.getBase() + CabinetClientProperties.getPlateMapEndpoint()))
+                requestTo(CabinetClientProperties.getBase() + CabinetClientProperties.getCabinetPlateMapEndpoint()))
                 .andExpect(header("Authorization", "Bearer " + cabinetUserCredentials.getBearerToken()))
                 .andExpect(method(HttpMethod.POST))
                 .andExpect(content().json(jsonString))
                 .andRespond(withStatus(HttpStatus.OK));
 
-        CabinetClient.save(plateMap);
+        CabinetClient.save(cabinetPlateMap);
         server.verify();
     }
 
     @Test
     public void saveRetryTwice() throws JsonProcessingException {
-        PlateMap plateMap = new PlateMap().activityName("G123BBB");
-        String jsonString = objectMapper.writeValueAsString(plateMap);
+        CabinetPlateMap cabinetPlateMap = new CabinetPlateMap().activityName("G123BBB");
+        String jsonString = objectMapper.writeValueAsString(cabinetPlateMap);
 
         server.expect(ExpectedCount.twice(),
-                requestTo(CabinetClientProperties.getBase() + CabinetClientProperties.getPlateMapEndpoint()))
+                requestTo(CabinetClientProperties.getBase() + CabinetClientProperties.getCabinetPlateMapEndpoint()))
                 .andExpect(header("Authorization", "Bearer " + cabinetUserCredentials.getBearerToken()))
                 .andExpect(method(HttpMethod.POST))
                 .andExpect(content().json(jsonString))
                 .andRespond(withStatus(HttpStatus.BAD_GATEWAY));
 
         server.expect(ExpectedCount.once(),
-                requestTo(CabinetClientProperties.getBase() + CabinetClientProperties.getPlateMapEndpoint()))
+                requestTo(CabinetClientProperties.getBase() + CabinetClientProperties.getCabinetPlateMapEndpoint()))
                 .andExpect(header("Authorization", "Bearer " + cabinetUserCredentials.getBearerToken()))
                 .andExpect(method(HttpMethod.POST))
                 .andExpect(content().json(jsonString))
                 .andRespond(withStatus(HttpStatus.OK));
 
-        CabinetClient.save(plateMap);
+        CabinetClient.save(cabinetPlateMap);
         server.verify();
     }
 
     @Test(expected = CabinetClientHTTPException.class)
     public void saveShouldNotTryMoreThanThreeTimes() throws JsonProcessingException, CabinetClientHTTPException {
-        PlateMap plateMap = new PlateMap().activityName("G123BBB");
-        String jsonString = objectMapper.writeValueAsString(plateMap);
+        CabinetPlateMap cabinetPlateMap = new CabinetPlateMap().activityName("G123BBB");
+        String jsonString = objectMapper.writeValueAsString(cabinetPlateMap);
 
         server.expect(ExpectedCount.times(3),
-                requestTo(CabinetClientProperties.getBase() + CabinetClientProperties.getPlateMapEndpoint()))
+                requestTo(CabinetClientProperties.getBase() + CabinetClientProperties.getCabinetPlateMapEndpoint()))
                 .andExpect(header("Authorization", "Bearer " + cabinetUserCredentials.getBearerToken()))
                 .andExpect(method(HttpMethod.POST))
                 .andExpect(content().json(jsonString))
                 .andRespond(withStatus(HttpStatus.BAD_GATEWAY));
 
-        CabinetClient.save(plateMap);
+        CabinetClient.save(cabinetPlateMap);
         server.verify();
     }
 
     @Test(expected = HttpServerErrorException.class)
     public void saveOtherExceptionShouldNotRetry() throws JsonProcessingException {
-        PlateMap plateMap = new PlateMap().activityName("G123BBB");
-        String jsonString = objectMapper.writeValueAsString(plateMap);
+        CabinetPlateMap cabinetPlateMap = new CabinetPlateMap().activityName("G123BBB");
+        String jsonString = objectMapper.writeValueAsString(cabinetPlateMap);
 
         server.expect(ExpectedCount.once(),
-                requestTo(CabinetClientProperties.getBase() + CabinetClientProperties.getPlateMapEndpoint()))
+                requestTo(CabinetClientProperties.getBase() + CabinetClientProperties.getCabinetPlateMapEndpoint()))
                 .andExpect(header("Authorization", "Bearer " + cabinetUserCredentials.getBearerToken()))
                 .andExpect(method(HttpMethod.POST))
                 .andExpect(content().json(jsonString))
                 .andRespond(withStatus(HttpStatus.INTERNAL_SERVER_ERROR));
 
-        CabinetClient.save(plateMap);
+        CabinetClient.save(cabinetPlateMap);
         server.verify();
     }
 
@@ -738,7 +738,7 @@ public class CabinetClientTest {
     @Test
     public void delete() {
         server.expect(ExpectedCount.once(),
-                requestTo(CabinetClientProperties.getBase() + CabinetClientProperties.getPlateMapEndpoint() + "/21"))
+                requestTo(CabinetClientProperties.getBase() + CabinetClientProperties.getCabinetPlateMapEndpoint() + "/21"))
                 .andExpect(method(HttpMethod.DELETE))
                 .andRespond(withStatus(HttpStatus.OK));
 
@@ -749,12 +749,12 @@ public class CabinetClientTest {
     @Test
     public void deleteRetryOnce() {
         server.expect(ExpectedCount.once(),
-                requestTo(CabinetClientProperties.getBase() + CabinetClientProperties.getPlateMapEndpoint() + "/21"))
+                requestTo(CabinetClientProperties.getBase() + CabinetClientProperties.getCabinetPlateMapEndpoint() + "/21"))
                 .andExpect(method(HttpMethod.DELETE))
                 .andRespond(withStatus(HttpStatus.BAD_GATEWAY));
 
         server.expect(ExpectedCount.once(),
-                requestTo(CabinetClientProperties.getBase() + CabinetClientProperties.getPlateMapEndpoint() + "/21"))
+                requestTo(CabinetClientProperties.getBase() + CabinetClientProperties.getCabinetPlateMapEndpoint() + "/21"))
                 .andExpect(method(HttpMethod.DELETE))
                 .andRespond(withStatus(HttpStatus.OK));
 
@@ -765,12 +765,12 @@ public class CabinetClientTest {
     @Test
     public void deleteRetryTwice() {
         server.expect(ExpectedCount.twice(),
-                requestTo(CabinetClientProperties.getBase() + CabinetClientProperties.getPlateMapEndpoint() + "/21"))
+                requestTo(CabinetClientProperties.getBase() + CabinetClientProperties.getCabinetPlateMapEndpoint() + "/21"))
                 .andExpect(method(HttpMethod.DELETE))
                 .andRespond(withStatus(HttpStatus.BAD_GATEWAY));
 
         server.expect(ExpectedCount.once(),
-                requestTo(CabinetClientProperties.getBase() + CabinetClientProperties.getPlateMapEndpoint() + "/21"))
+                requestTo(CabinetClientProperties.getBase() + CabinetClientProperties.getCabinetPlateMapEndpoint() + "/21"))
                 .andExpect(method(HttpMethod.DELETE))
                 .andRespond(withStatus(HttpStatus.OK));
 
@@ -781,7 +781,7 @@ public class CabinetClientTest {
     @Test(expected = CabinetClientHTTPException.class)
     public void deleteShouldNotTryMoreThanThreeTimes() throws CabinetClientHTTPException {
         server.expect(ExpectedCount.times(3),
-                requestTo(CabinetClientProperties.getBase() + CabinetClientProperties.getPlateMapEndpoint() + "/21"))
+                requestTo(CabinetClientProperties.getBase() + CabinetClientProperties.getCabinetPlateMapEndpoint() + "/21"))
                 .andExpect(method(HttpMethod.DELETE))
                 .andRespond(withStatus(HttpStatus.BAD_GATEWAY));
 
@@ -792,7 +792,7 @@ public class CabinetClientTest {
     @Test(expected = HttpServerErrorException.class)
     public void deleteOtherExceptionShouldNotRetry() {
         server.expect(ExpectedCount.once(),
-                requestTo(CabinetClientProperties.getBase() + CabinetClientProperties.getPlateMapEndpoint() + "/21"))
+                requestTo(CabinetClientProperties.getBase() + CabinetClientProperties.getCabinetPlateMapEndpoint() + "/21"))
                 .andExpect(method(HttpMethod.DELETE))
                 .andRespond(withStatus(HttpStatus.INTERNAL_SERVER_ERROR));
 
@@ -849,7 +849,7 @@ public class CabinetClientTest {
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(withStatus(HttpStatus.OK));
 
-        plateMapCabinetClient.findByLabel("foo");
+        cabinetPlateMapCabinetClient.findByLabel("foo");
         server.verify();
     }
 
@@ -863,7 +863,7 @@ public class CabinetClientTest {
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(withStatus(HttpStatus.OK));
 
-        plateMapCabinetClient.findByLabel("foo", 1, 10);
+        cabinetPlateMapCabinetClient.findByLabel("foo", 1, 10);
         server.verify();
     }
 
@@ -876,21 +876,21 @@ public class CabinetClientTest {
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(withStatus(HttpStatus.OK));
 
-        plateMapCabinetClient.findFirstByLabel("name");
+        cabinetPlateMapCabinetClient.findFirstByLabel("name");
         server.verify();
     }
 
 
     @Test
     public void findByFieldEqualsUri() {
-        String uriString = CabinetClientProperties.getBase() + CabinetClientProperties.getPlateMapEndpoint() + "?foo.equals=baa&page=0&size=" + MAX_VALUE;
+        String uriString = CabinetClientProperties.getBase() + CabinetClientProperties.getCabinetPlateMapEndpoint() + "?foo.equals=baa&page=0&size=" + MAX_VALUE;
         URI uri = CabinetClient.findByFieldEqualsUri("foo", "baa");
         assertEquals(uriString, uri.toString());
     }
 
     @Test
     public void findByFieldsEqualUri() {
-        String uriString = CabinetClientProperties.getBase() + CabinetClientProperties.getPlateMapEndpoint() + "?foo.equals=baa&foz.equals=baz%20%2B%20boz&page=0&size=20";
+        String uriString = CabinetClientProperties.getBase() + CabinetClientProperties.getCabinetPlateMapEndpoint() + "?foo.equals=baa&foz.equals=baz%20%2B%20boz&page=0&size=20";
         Map<String, String> params = new LinkedHashMap<>();
         params.put("foo", "baa");
         params.put("foz", "baz + boz");
@@ -900,14 +900,14 @@ public class CabinetClientTest {
 
     @Test
     public void findByFieldWithOperatorsUri() {
-        String uriString = CabinetClientProperties.getBase() + CabinetClientProperties.getPlateMapEndpoint() + "?foo.greaterThan=15&page=0&size=" + MAX_VALUE;
+        String uriString = CabinetClientProperties.getBase() + CabinetClientProperties.getCabinetPlateMapEndpoint() + "?foo.greaterThan=15&page=0&size=" + MAX_VALUE;
         URI uri = CabinetClient.findByFieldWithOperatorUri("foo", "15", "greaterThan");
         assertEquals(uriString, uri.toString());
     }
 
     @Test
     public void findByFieldsWithOperatorsUri() {
-        String uriString = CabinetClientProperties.getBase() + CabinetClientProperties.getPlateMapEndpoint() + "?foo.greaterThan=15&bar.equals=baz&page=0&size=20";
+        String uriString = CabinetClientProperties.getBase() + CabinetClientProperties.getCabinetPlateMapEndpoint() + "?foo.greaterThan=15&bar.equals=baz&page=0&size=20";
         Map<String, Map<String, String>> params = new LinkedHashMap<>();
         Map<String, String> field1 = Stream.of(new String[][]{{"operator", "greaterThan"}, {"value", "15"},}).collect(Collectors.toMap(data -> data[0], data -> data[1]));
         Map<String, String> field2 = Stream.of(new String[][]{{"operator", "equals"}, {"value", "baz"},}).collect(Collectors.toMap(data -> data[0], data -> data[1]));
@@ -921,7 +921,7 @@ public class CabinetClientTest {
     @Test
     public void searchUri() {
         String uriString = CabinetClientProperties.getBase() + CabinetClientProperties.getSearchPathComponent()
-                + "/" + CabinetClientProperties.getPlateMapEndpoint() + "?query=foo&page=10&size=15";
+                + "/" + CabinetClientProperties.getCabinetPlateMapEndpoint() + "?query=foo&page=10&size=15";
         URI uri = CabinetClient.searchUri("foo", 10, 15);
 
         assertEquals(uriString, uri.toString());
@@ -929,19 +929,19 @@ public class CabinetClientTest {
 
     @Test
     public void getEntityClassName() {
-        assertEquals(PlateMap.class.toString(), CabinetClient.getEntityClassName());
+        assertEquals(CabinetPlateMap.class.toString(), CabinetClient.getEntityClassName());
     }
 
     @Test
     public void getEntityClass() {
-        assertSame(PlateMap.class, CabinetClient.getEntityClass());
+        assertSame(CabinetPlateMap.class, CabinetClient.getEntityClass());
     }
 
     @Test
     public void childEntityIdsAreValidFieldForSample() {
         server.expect(ExpectedCount.once(),
                 requestTo(CabinetClientProperties.getBase()
-                        + "plate-maps?wellId.equals=1&communityId.equals=1&plateMapId.equals=1&mediaId.equals=1&page=10&size=50"))
+                        + "plate-maps?wellId.equals=1&communityId.equals=1&cabinetPlateMapId.equals=1&mediaId.equals=1&page=10&size=50"))
                 .andExpect(header("Authorization", "Bearer " + cabinetUserCredentials.getBearerToken()))
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(withStatus(HttpStatus.OK));
@@ -949,10 +949,10 @@ public class CabinetClientTest {
         Map<String, String> params = new LinkedHashMap<>(); //insertion ordered map
         params.put("wellId", "1");
         params.put("communityId", "1");
-        params.put("plateMapId", "1");
+        params.put("cabinetPlateMapId", "1");
         params.put("mediaId", "1");
 
-        plateMapCabinetClient.findByFieldsEqual(params, 10, 50);
+        cabinetPlateMapCabinetClient.findByFieldsEqual(params, 10, 50);
         server.verify();
     }
 }

@@ -36,7 +36,7 @@ public class CabinetClientProperties {
 
     private String authorityEndpoint = "authorities";
     private String persistentAuditEventEndpoint = "persistent-audit-events";
-    private String plateMapEndpoint = "plate-maps";
+    private String cabinetPlateMapEndpoint = "plate-maps";
     private String userEndpoint = "users";
 
     private long retryInterval = 5000L;
@@ -84,8 +84,8 @@ public class CabinetClientProperties {
         this.persistentAuditEventEndpoint = persistentAuditEventEndpoint;
     }
 
-    public String getPlateMapEndpoint() {
-        return plateMapEndpoint;
+    public String getCabinetPlateMapEndpoint() {
+        return cabinetPlateMapEndpoint;
     }
 
     public String getUserEndpoint() {

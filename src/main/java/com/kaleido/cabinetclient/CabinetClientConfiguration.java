@@ -13,7 +13,6 @@ import com.kaleido.cabinetclient.domain.*;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Primary;
 import org.springframework.retry.backoff.ExponentialBackOffPolicy;
 import org.springframework.retry.policy.SimpleRetryPolicy;
 import org.springframework.retry.support.RetryTemplate;
@@ -38,8 +37,7 @@ public class CabinetClientConfiguration {
         this.cabinetClientProperties = cabinetClientProperties;
     }
 
-    @Bean
-    @Primary
+    @Bean (name = "cabinetRestTemplate")
     RestTemplate cabinetRestTemplate(CabinetJWTRequestInterceptor cabinetJWTRequestInterceptor) {
         RestTemplate restTemplate = new RestTemplate();
         restTemplate.getInterceptors().add(cabinetJWTRequestInterceptor);
@@ -61,7 +59,7 @@ public class CabinetClientConfiguration {
      * maxRequestAttempts: The max amount of times a request can be called.  This value is inclusive of the original attempt.
      * Setting this value to 1 would effectively disable retry.
      **/
-    @Bean
+    @Bean (name = "cabinetRetryTemplate")
     public RetryTemplate cabinetRetryTemplate() {
         RetryTemplate retryTemplate = new RetryTemplate();
         ExponentialBackOffPolicy exponentialBackOffPolicy = new ExponentialBackOffPolicy();
@@ -85,40 +83,40 @@ public class CabinetClientConfiguration {
     }
 
     @Bean
-    CabinetClient<Authority> cabinetAuthorityClient(RestTemplate restTemplate, RetryTemplate retryTemplate) {
+    CabinetClient<Authority> cabinetAuthorityClient(RestTemplate cabinetRestTemplate, RetryTemplate cabinetRetryTemplate) {
         return new CabinetClient<>(cabinetClientProperties.getBase() + cabinetClientProperties.getAuthorityEndpoint(),
                 cabinetClientProperties.getBase() +
                         cabinetClientProperties.getSearchPathComponent() + "/"
                         + cabinetClientProperties.getAuthorityEndpoint(),
-                restTemplate, retryTemplate, Authority.class);
+                cabinetRestTemplate, cabinetRetryTemplate, Authority.class);
     }
 
     @Bean
-    CabinetClient<PersistentAuditEvent> cabinetPersistentAuditEventClient(RestTemplate restTemplate, RetryTemplate retryTemplate) {
+    CabinetClient<PersistentAuditEvent> cabinetPersistentAuditEventClient(RestTemplate cabinetRestTemplate, RetryTemplate cabinetRetryTemplate) {
         return new CabinetClient<>(cabinetClientProperties.getBase() + cabinetClientProperties.getPersistentAuditEventEndpoint(),
                 cabinetClientProperties.getBase() +
                         cabinetClientProperties.getSearchPathComponent() + "/"
                         + cabinetClientProperties.getPersistentAuditEventEndpoint(),
-                restTemplate, retryTemplate, PersistentAuditEvent.class);
+                cabinetRestTemplate, cabinetRetryTemplate, PersistentAuditEvent.class);
     }
 
 
     @Bean
-    CabinetClient<PlateMap> cabinetPlateMapClient(RestTemplate restTemplate, RetryTemplate retryTemplate) {
-        return new CabinetClient<>(cabinetClientProperties.getBase() + cabinetClientProperties.getPlateMapEndpoint(),
+    CabinetClient<CabinetPlateMap> cabinetPlateMapClient(RestTemplate cabinetRestTemplate, RetryTemplate cabinetRetryTemplate) {
+        return new CabinetClient<>(cabinetClientProperties.getBase() + cabinetClientProperties.getCabinetPlateMapEndpoint(),
                 cabinetClientProperties.getBase() +
                         cabinetClientProperties.getSearchPathComponent() + "/"
-                        + cabinetClientProperties.getPlateMapEndpoint(),
-                restTemplate, retryTemplate, PlateMap.class);
+                        + cabinetClientProperties.getCabinetPlateMapEndpoint(),
+                cabinetRestTemplate, cabinetRetryTemplate, CabinetPlateMap.class);
     }
 
     @Bean
-    CabinetClient<User> cabinetUserClient(RestTemplate restTemplate, RetryTemplate retryTemplate) {
+    CabinetClient<User> cabinetUserClient(RestTemplate cabinetRestTemplate, RetryTemplate cabinetRetryTemplate) {
         return new CabinetClient<>(cabinetClientProperties.getBase() + cabinetClientProperties.getUserEndpoint(),
                 cabinetClientProperties.getBase() +
                         cabinetClientProperties.getSearchPathComponent() + "/"
                         + cabinetClientProperties.getUserEndpoint(),
-                restTemplate, retryTemplate, User.class);
+                cabinetRestTemplate, cabinetRetryTemplate, User.class);
     }
 
 
