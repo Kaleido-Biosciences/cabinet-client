@@ -251,6 +251,19 @@ public class CabinetClient<E> {
         return retryTemplate.execute(arg0 -> restTemplate.getForEntity(endpoint + "/" + methodName + "/" + value, entityClass));
     }
 
+    /**
+     * Find all of an entity using methods defined in Kapture resources.
+     *
+     * @param methodName the name of the method to search against (e.g. Sample api method '/label will' call case insensitive search function)
+     * @param value the value to be passed to the method
+     * @return A response with the matching entity (if any)
+     */
+    public ResponseEntity<List<E>> findAllByMethod(final String methodName, final String value) {
+        String uri = endpoint + "/" + methodName + (value != null ? "/" + value : "/");
+        return retryTemplate.execute(arg0 -> restTemplate.exchange(uri,
+                HttpMethod.GET, null, parameterizedTypeReference));
+    }
+
     public ResponseEntity<List<E>> findAll() {
         return findAll(DEFAULT_PAGE, DEFAULT_SIZE);
     }
