@@ -32,7 +32,7 @@ public class CabinetPlateMap implements Serializable {
     private String activityName;
 
     /**
-     * The data field is a gzip -> base64 encoded string of the plate map data
+     * The data field is a gzip - base64 encoded string of the plate map data
      */
     private String data;
 

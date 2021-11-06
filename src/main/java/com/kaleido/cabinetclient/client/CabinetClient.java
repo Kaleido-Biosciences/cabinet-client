@@ -7,6 +7,7 @@ package com.kaleido.cabinetclient.client;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
@@ -44,11 +45,15 @@ public class CabinetClient<E> {
     @Autowired
     ApplicationContext context;
 
-    private final RetryTemplate retryTemplate;
+    @Autowired
+    @Qualifier("cabinetRetryTemplate")
+    private final RetryTemplate cabinetRetryTemplate;
 
     private final String endpoint;
     private final String searchEndpoint;
-    private final RestTemplate restTemplate;
+    @Autowired
+    @Qualifier("cabinetRestTemplate")
+    private final CabinetRestTemplate cabinetRestTemplate;
     private final Class<E> entityClass;
 
     private static final String PAGE = "page";
@@ -72,16 +77,16 @@ public class CabinetClient<E> {
      * A client to the Cabinet service parameterized on type {@code E}.
      *
      * @param endpoint     the endpoint extension (e.g. {@code /batches}) relevant to type {@code E}
-     * @param restTemplate a rest template
+     * @param cabinetRestTemplate a rest template
      * @param entityClass  the type token of type {@code E}. This is required to get around Java's erasure of generic
      *                     types at runtime.
      */
-    public CabinetClient(String endpoint, String searchEndpoint, RestTemplate restTemplate, RetryTemplate retryTemplate, Class<E> entityClass) {
+    public CabinetClient(String endpoint, String searchEndpoint, CabinetRestTemplate cabinetRestTemplate, RetryTemplate cabinetRetryTemplate, Class<E> entityClass) {
         this.endpoint = endpoint;
         this.searchEndpoint = searchEndpoint;
-        this.restTemplate = restTemplate;
+        this.cabinetRestTemplate = cabinetRestTemplate;
         this.entityClass = entityClass;
-        this.retryTemplate = retryTemplate;
+        this.cabinetRetryTemplate = cabinetRetryTemplate;
 
         this.fieldsInClass = new ArrayList<>();
 
@@ -150,12 +155,12 @@ public class CabinetClient<E> {
      */
     public ResponseEntity<List<E>> findByFieldsEqual(
             final Map<String, String> fieldValueMap, final int pageNumber, final int pageSize) {
-        return retryTemplate.execute(arg0 -> {
+        return cabinetRetryTemplate.execute(arg0 -> {
             //check that the entityClass has the fields
             checkSearchFields(fieldValueMap.keySet());
 
 
-            return restTemplate.exchange(findByFieldsEqualUri(fieldValueMap, pageNumber, pageSize),
+            return cabinetRestTemplate.exchange(findByFieldsEqualUri(fieldValueMap, pageNumber, pageSize),
                     HttpMethod.GET, null, parameterizedTypeReference);
         });
     }
@@ -210,10 +215,10 @@ public class CabinetClient<E> {
      * @return the {@code List} of entities that match the search criteria up to {@code DEFAULT_SIZE}
      */
     public ResponseEntity<List<E>> findByFieldsWithOperators(final Map<String, Map<String, String>> fieldValOperatorMap, int pageNumber, int pageSize) {
-        return retryTemplate.execute(arg0 -> {
+        return cabinetRetryTemplate.execute(arg0 -> {
             checkSearchFields(fieldValOperatorMap.keySet());
 
-            return restTemplate.exchange(findByFieldsWithOperatorsUri(fieldValOperatorMap, pageNumber, pageSize),
+            return cabinetRestTemplate.exchange(findByFieldsWithOperatorsUri(fieldValOperatorMap, pageNumber, pageSize),
                     HttpMethod.GET, null, parameterizedTypeReference);
         });
     }
@@ -237,7 +242,7 @@ public class CabinetClient<E> {
      * @return A response with the matching entity (if any)
      */
     public ResponseEntity<E> find(final Long entityId) {
-        return retryTemplate.execute(arg0 -> restTemplate.getForEntity(endpoint + "/" + entityId, entityClass));
+        return cabinetRetryTemplate.execute(arg0 -> cabinetRestTemplate.getForEntity(endpoint + "/" + entityId, entityClass));
     }
 
     /**
@@ -248,7 +253,7 @@ public class CabinetClient<E> {
      * @return A response with the matching entity (if any)
      */
     public ResponseEntity<E> findOneByMethod(final String methodName, final String value) {
-        return retryTemplate.execute(arg0 -> restTemplate.getForEntity(endpoint + "/" + methodName + "/" + value, entityClass));
+        return cabinetRetryTemplate.execute(arg0 -> cabinetRestTemplate.getForEntity(endpoint + "/" + methodName + "/" + value, entityClass));
     }
 
     /**
@@ -260,7 +265,7 @@ public class CabinetClient<E> {
      */
     public ResponseEntity<List<E>> findAllByMethod(final String methodName, final String value) {
         String uri = endpoint + "/" + methodName + (value != null ? "/" + value : "/");
-        return retryTemplate.execute(arg0 -> restTemplate.exchange(uri,
+        return cabinetRetryTemplate.execute(arg0 -> cabinetRestTemplate.exchange(uri,
                 HttpMethod.GET, null, parameterizedTypeReference));
     }
 
@@ -269,7 +274,7 @@ public class CabinetClient<E> {
     }
 
     public ResponseEntity<List<E>> findAll(int pageNumber, int pageSize) {
-        return retryTemplate.execute(arg0 -> restTemplate.exchange(findByFieldsEqualUri(Collections.EMPTY_MAP, pageNumber, pageSize),
+        return cabinetRetryTemplate.execute(arg0 -> cabinetRestTemplate.exchange(findByFieldsEqualUri(Collections.EMPTY_MAP, pageNumber, pageSize),
                 HttpMethod.GET, null, parameterizedTypeReference));
     }
 
@@ -282,17 +287,17 @@ public class CabinetClient<E> {
      * set.
      */
     public ResponseEntity<E> save(@Valid E entity) {
-        return retryTemplate.execute(arg0 -> {
+        return cabinetRetryTemplate.execute(arg0 -> {
             //check if the id has already been set
             try {
                 Long id = (Long) new PropertyDescriptor("id", entityClass).getReadMethod().invoke(entity);
                 if (id == null) {
                     //no id, POST it
-                    return restTemplate.postForEntity(endpoint, entity, entityClass);
+                    return cabinetRestTemplate.postForEntity(endpoint, entity, entityClass);
                 } else {
                     //got an id, PUT it
                     HttpEntity<E> httpEntity = new HttpEntity<>(entity);
-                    return restTemplate.exchange(endpoint, HttpMethod.PUT, httpEntity, entityClass);
+                    return cabinetRestTemplate.exchange(endpoint, HttpMethod.PUT, httpEntity, entityClass);
                 }
             } catch (IntrospectionException | ReflectiveOperationException e) {
                 log.error("Error accessing ID of entity {}", entity);
@@ -309,9 +314,9 @@ public class CabinetClient<E> {
      * set.
      */
     public ResponseEntity<List<E>> saveAll(@Valid List<E> entityList) {
-        return retryTemplate.execute(arg0 -> {
+        return cabinetRetryTemplate.execute(arg0 -> {
                     HttpEntity<Object> requestEntity = new HttpEntity<Object>(entityList);
-                    return restTemplate
+                    return cabinetRestTemplate
                             .exchange(endpoint + "/save-all", HttpMethod.POST, requestEntity, new ParameterizedTypeReference<List<E>>() {
                             });
                 }
@@ -324,8 +329,8 @@ public class CabinetClient<E> {
      * @param entityId the id of the entity to delete
      */
     public void delete(final Long entityId) {
-        retryTemplate.execute(arg0 -> {
-            restTemplate.delete(endpoint + "/{id}", entityId);
+        cabinetRetryTemplate.execute(arg0 -> {
+            cabinetRestTemplate.delete(endpoint + "/{id}", entityId);
             return null;
         });
 
@@ -426,9 +431,9 @@ public class CabinetClient<E> {
      * @return the list of matching entities
      */
     public ResponseEntity<List<E>> search(String query, int pageNumber, int pageSize) {
-        return retryTemplate.execute(arg0 -> {
+        return cabinetRetryTemplate.execute(arg0 -> {
             URI searchUri = searchUri(query, pageNumber, pageSize);
-            return restTemplate.exchange(searchUri, HttpMethod.GET, null, parameterizedTypeReference);
+            return cabinetRestTemplate.exchange(searchUri, HttpMethod.GET, null, parameterizedTypeReference);
         });
 
     }

@@ -45,7 +45,7 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 public class CabinetClientTest {
 
     @Autowired
-    RestTemplate restTemplate;
+    CabinetRestTemplate cabinetRestTemplate;
 
     @Autowired
     CabinetClientProperties CabinetClientProperties;
@@ -71,7 +71,7 @@ public class CabinetClientTest {
     public void setUp() {
         cabinetUserCredentials.setBearerToken(FAKE_BEARER_TOKEN);
         cabinetUserCredentials.setBearerExpiry(FAKE_BEARER_NOT_EXPIRED);
-        server = MockRestServiceServer.createServer(restTemplate);
+        server = MockRestServiceServer.createServer(cabinetRestTemplate);
     }
 
     @After

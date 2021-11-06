@@ -5,6 +5,7 @@
 package com.kaleido.cabinetclient.authentication;
 
 import com.kaleido.cabinetclient.CabinetClientProperties;
+import com.kaleido.cabinetclient.client.CabinetRestTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -19,25 +20,25 @@ import org.springframework.web.client.RestTemplate;
 @Service
 @EnableConfigurationProperties({CabinetClientProperties.class})
 public class CabinetAuthClient {
-    private RestTemplate restTemplate;
+    private CabinetRestTemplate cabinetRestTemplate;
     private String serviceUri;
 
     public static final String AUTH_ENDPOINT = "authenticate";
 
     Logger log = LoggerFactory.getLogger(CabinetAuthClient.class);
 
-    public RestTemplate getRestTemplate() {
-        return restTemplate;
+    public CabinetRestTemplate getCabinetRestTemplate() {
+        return cabinetRestTemplate;
     }
 
     public CabinetAuthClient(CabinetClientProperties CabinetClientProperties) {
         this.serviceUri = CabinetClientProperties.getBase();
 
         /*
-         * important to declare a new RestTemplate here so that we don't get the one with the JWTInterceptor which will
+         * important to declare a new CabinetRestTemplate here so that we don't get the one with the JWTInterceptor which will
          * attempt to add a token that we don't have yet
          */
-        this.restTemplate = new RestTemplate();
+        this.cabinetRestTemplate = new CabinetRestTemplate();
     }
 
     /**
@@ -48,7 +49,7 @@ public class CabinetAuthClient {
     public UserToken getUserToken(CabinetUserCredentials cabinetUserCredentials){
 
         log.info("getting user token from {}", serviceUri+AUTH_ENDPOINT);
-        UserToken userToken = restTemplate.postForObject(serviceUri + AUTH_ENDPOINT, cabinetUserCredentials, UserToken.class);
+        UserToken userToken = cabinetRestTemplate.postForObject(serviceUri + AUTH_ENDPOINT, cabinetUserCredentials, UserToken.class);
 
         if( StringUtils.hasText(userToken.getBearer()) ){
             log.info("obtained token");

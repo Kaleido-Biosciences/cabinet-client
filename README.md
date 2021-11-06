@@ -89,9 +89,9 @@ If the Cabinet application is updated to provide new Entities then the following
 1. Declare a `@Bean` in `CabinetClientConfiguration` for the new entity type. e.g. 
 ```java
     @Bean
-    CabinetClient<NewEntity> newEntityClient(RestTemplate restTemplate){
+    CabinetClient<NewEntity> newEntityClient(CabinetRestTemplate cabinetRestTemplate){
         return new CabinetClient<>(cabinetClientProperties.getBase()+cabinetClientProperties.getNewEntityEndpoint(),
-                restTemplate, NewEntity.class);
+                cabinetRestTemplate, NewEntity.class);
     }
 ```
 

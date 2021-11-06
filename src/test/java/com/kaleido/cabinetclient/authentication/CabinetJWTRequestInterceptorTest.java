@@ -8,12 +8,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kaleido.cabinetclient.CabinetClientProperties;
 import com.kaleido.cabinetclient.client.CabinetClient;
 import com.kaleido.cabinetclient.client.CabinetResponseErrorHandler;
+import com.kaleido.cabinetclient.client.CabinetRestTemplate;
 import com.kaleido.cabinetclient.domain.CabinetPlateMap;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -41,10 +43,12 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 public class CabinetJWTRequestInterceptorTest {
 
     @Autowired
-    CabinetJWTRequestInterceptor interceptor;
+    @Qualifier("cabinetJWTRequestInterceptor")
+    CabinetJWTRequestInterceptor cabinetJWTRequestInterceptor;
 
     @Autowired
-    RestTemplate restTemplate;
+    @Qualifier("cabinetRestTemplate")
+    CabinetRestTemplate cabinetRestTemplate;
 
     @Autowired
     CabinetUserCredentials cabinetUserCredentials;
@@ -59,7 +63,8 @@ public class CabinetJWTRequestInterceptorTest {
     CabinetClient<CabinetPlateMap> cabinetPlateMapCabinetClient;
 
     @Autowired
-    RetryTemplate retryTemplate;
+    @Qualifier("cabinetRetryTemplate")
+    RetryTemplate cabinetRetryTemplate;
 
 
     private static final Instant FAKE_BEARER_EXPIRED = Instant.now().minus(Duration.ofDays(1L));
@@ -82,8 +87,8 @@ public class CabinetJWTRequestInterceptorTest {
     public void init() {
         cabinetUserCredentials.setBearerToken(FAKE_BEARER_TOKEN);
         cabinetUserCredentials.setBearerExpiry(FAKE_BEARER_NOT_EXPIRED);
-        mockServer = MockRestServiceServer.createServer(restTemplate);
-        authServer = MockRestServiceServer.createServer(cabinetAuthClient.getRestTemplate());
+        mockServer = MockRestServiceServer.createServer(cabinetRestTemplate);
+        authServer = MockRestServiceServer.createServer(cabinetAuthClient.getCabinetRestTemplate());
     }
 
     @After
@@ -93,9 +98,9 @@ public class CabinetJWTRequestInterceptorTest {
 
     @Test
     public void jwtInterceptorShouldBeInRestTemplate() {
-        assertTrue(restTemplate.getInterceptors()
+        assertTrue(cabinetRestTemplate.getInterceptors()
                 .stream()
-                .anyMatch(interceptor -> interceptor.getClass().equals(CabinetJWTRequestInterceptor.class)));
+                .anyMatch(cabinetJWTRequestInterceptor -> cabinetJWTRequestInterceptor.getClass().equals(CabinetJWTRequestInterceptor.class)));
     }
 
     @Test
@@ -163,10 +168,10 @@ public class CabinetJWTRequestInterceptorTest {
 
     @Test(expected = AssertionError.class)
     public void jwtTokenShouldNotBeAddedForOtherUrls() throws Exception {
-        restTemplate.setErrorHandler(new CabinetResponseErrorHandler());
+        cabinetRestTemplate.setErrorHandler(new CabinetResponseErrorHandler());
         CabinetClient<CabinetPlateMap> myClient = new CabinetClient<>("http://someotherdomain.com/api/plate-maps",
                 "http://someotherdomain.com/api/_search/plate-maps",
-                restTemplate, retryTemplate, CabinetPlateMap.class);
+                cabinetRestTemplate, cabinetRetryTemplate, CabinetPlateMap.class);
         mockServer.expect(ExpectedCount.once(),
                 requestTo("http://someotherdomain.com/api/plate-maps/1"))
                 .andExpect(header("Authorization", "Bearer " + cabinetUserCredentials.getBearerToken()))
